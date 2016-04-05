@@ -1,6 +1,6 @@
 CREATE TABLE Ingredient(
 	id SERIAL PRIMARY KEY,
-	name varchar(50) UNIQUE NOT NULL
+	name citext UNIQUE NOT NULL
 );
 
 CREATE TABLE Category(
