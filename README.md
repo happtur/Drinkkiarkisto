@@ -1,6 +1,6 @@
 # Tietokantasovelluksen esittelysivu
 
-Yleisiä linkkejä:
+## Yleisiä linkkejä:
 
 - [Linkki sovellukseeni](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/)
   * Etusivulta pääsee listaussivulle klikkaamalla navigointipalkin "Drink Recipes", sen jälkeen yhteys muihin sivuihin melko intuitiivinen 
