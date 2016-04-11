@@ -5,7 +5,8 @@ Yleisiä linkkejä:
 - [Linkki sovellukseeni](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/)
   * [Linkki drinkinlistaussivuun](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/drinks)
   * [Linkki drinkkisivuun](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/drink/1)
-  * [Linkki drinkin muokkaussivuun](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/drink/1/edit)
+  * [Linkki drinkin lisäyssivuun](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/drink/new)
+  * [Linkki drinkin muokkaussivuun (ei toimi)](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/drink/1/edit)
 - [Linkki dokumentaatiooni](doc/dokumentaatio.pdf)
 
 ## Työn aihe
