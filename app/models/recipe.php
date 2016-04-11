@@ -7,6 +7,46 @@ class Recipe extends BaseModel {
 		parent::__construct($attributes);
 	}
 
+	//to be changed.. particularly the input (-> dropdown menu or sthg)
+	public static function category($category) {
+		$query = DB::connection() -> prepare('SELECT id FROM Category WHERE name = :category LIMIT 1');
+		$query -> execute(array('category' => $category));
+
+		$row = $query->fetch();
+
+		if($row) {
+			return $row['id'];
+		}
+		//else??
+	}
+
+	public function save() {
+		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions) VALUES (:name, :category, :instructions) RETURNING id;');
+		$query -> execute(array('name' => $this->name, 'category' => $this->category, 'instructions' => $this->instructions));
+
+		$row = $query -> fetch();
+		$this->id = $row['id'];
+
+	}
+
+	public function addIngredient($ingredient) {
+		$ingId = $ingredient->getId();
+
+		if($ingId == -1) {
+
+			$query = DB::connection() -> prepare('INSERT INTO Ingredient (name) VALUES (:ingredient) RETURNING id;');
+			$query -> execute(array('ingredient' => $ingredient->name));
+
+			$row = $query->fetch();
+			$ingId = $row['id'];
+		}
+
+		$query = DB::connection() -> prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:id, :ingredient, :amount)');
+		$query -> execute(array('id' => $this->id, 'ingredient' => $ingId, 'amount' => $ingredient->amount));
+
+		$ingredients = $this->ingredients;
+		$ingredients[] = $ingredient;
+	}
 	
 
 	public static function findAll() {
@@ -29,30 +69,40 @@ class Recipe extends BaseModel {
 	}
 
 
-	//combined. Might change to Ingredient-objects, when the time comes...
+	//combined
 	public static function findOne($id) {
 		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Recipe.instructions AS instructions, Category.name AS category, Recipe_ingredient.amount AS amount, Ingredient.name AS ingredient
 			FROM Recipe 
 			LEFT JOIN Category ON Recipe.category = Category.id
-			INNER JOIN Recipe_ingredient ON Recipe.id = Recipe_ingredient.recipe
-			INNER JOIN Ingredient ON Recipe_ingredient.ingredient = Ingredient.id
+			LEFT JOIN Recipe_ingredient ON Recipe.id = Recipe_ingredient.recipe
+			LEFT JOIN Ingredient ON Recipe_ingredient.ingredient = Ingredient.id
 			WHERE Recipe.id = :id;');
 
 		$query -> execute(array('id' => $id));
 		$rows = $query -> fetchAll();
 
 		$ingredients = array();
+		$name = "n";
+		$category = "c";
+		$instructions = "i";
+
 		foreach($rows as $row) {
-			$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
+			if($row['ingredient'] != null) {
+				$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
+			}
+			
+			//should do for one row only
+			$name = $row['name'];
+			$category = $row['category'];
+			$instructions =  $row['instructions'];
 		}
 		
 
-		$row = $rows[0];
 		$recipe = new Recipe(array(
 			'id' => $id,
-			'name' => $row['name'],
-			'category' => $row['category'],
-			'instructions' => $row['instructions'],
+			'name' => $name,
+			'category' => $category,
+			'instructions' => $instructions,
 			'ingredients' => $ingredients
 			));
 

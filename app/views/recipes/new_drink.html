@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>New drink</h1>
+</br>
+<form method="post" action="{{base_path}}/drink/new">
+	<div class="form-group">
+		<!-- id and name... -->
+		<label for="inputName">Name</label>
+		<input type="text" name="name" class="form-control" id="inputName"></input>
+	</div>
+	<div class="form-group">
+		<label>Category</label>
+		<input type="text" name="category" class="form-control"></input>
+	</div>
+<!-- doesn't work, I'm gonna go with input until I figure it out-->
+
+<!-- 	<div class="form-group">
+		<label>Instructions</label>
+		<textarea name="instructions" class="form-control">Instructions
+		</textarea>
+	</div> -->
+
+	<div class="form-group">
+		<label>Instructions</label>
+		<input type="text" name="instructions" class="form-control"></input>
+	</div>
+
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary">Save</button>
+	</div>
+</form>
+
+{% endblock %}

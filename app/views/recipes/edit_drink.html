@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Edit drink {{recipe.name}}</h1>
+</br>
+<form>
+	<div class="form-group">
+		<label for="inputName">Name</label>
+		<input type="text" class="form-control" id="inputName" value={{recipe.name}}></input>
+	</div>
+	<div class="form-group">
+		<label>Category</label>
+		<input type="text" class="form-control" value={{recipe.category}}></input>
+	</div>
+
+
+	<div class="form-group">
+		<label>Ingredients</label>
+
+		{% for ingredient in recipe.ingredients %}
+
+		<div class="form-group">
+			<label class="col-xs-3 control-label">{{ingredient.name}}:</label>
+			<div class="col-xs-4">
+				<input type="text" class="form-control" value={{ingredient.amount}}></input>
+			</div>
+			<div>
+				<button type="button" class="btn btn-danger">Delete</button>
+			</div>
+		{% endfor %}		
+	</div>
+	<div class="form-group">
+		<label>Add ingredient</label>
+		<input type="text" class="form-control" placeholder="Ingredient"></input>
+		<input type="text" class="form-control" placeholder="Amount"></input>
+		<button type="button" class="btn btn-primary">Add</button>
+	</div>
+
+	<div class="form-group">
+		<label>Instructions</label>
+		<textarea class="form-control">  {{recipe.instructions}}
+		</textarea>
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary">Save</button>
+	</div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{recipe.name}}</h1>
+</br>
+<form method="post" action="{{base_path}}/drink/addingredient/{{recipe.id}}">
+	<div class="form-group">
+	<!-- id and name... -->
+		<label for="inputName">Ingredient</label>
+		<input type="text" name="name" class="form-control" id="inputName"></input>
+	</div>
+	<div class="form-group">
+		<label>Amount</label>
+		<input type="text" name="amount" class="form-control"></input>
+	</div>
+
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary">Add ingredient</button>
+	</div>
+</form>
+
+</br>
+<p>
+	<a href="{{base_path}}/drink/{{recipe.id}}" class="btn btn-primary btn-sm">Done</a>
+</p>
+
+{% endblock %}

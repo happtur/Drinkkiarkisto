@@ -17,16 +17,4 @@
       Kint::dump($recipes);
       Kint::dump($recipe);
     }
-
-    public static function list_drinks() {
-      View::make('plans/drink_list_page.html');
-    }
-
-    public static function show_drink() {
-      View::make('plans/drink_page.html');
-    }
-
-    public static function edit_drink() {
-      View::make('plans/edit_drink_page.html');
-    }
   }
