@@ -7,7 +7,8 @@ class Recipe extends BaseModel {
 		parent::__construct($attributes);
 	}
 
-	//to be changed.. particularly the input (-> dropdown menu or sthg)
+	//to be changed.. particularly the input (-> (?textfield with? )dropdown menu or sthg)
+	//move to category-class?
 	public static function category($category) {
 		$query = DB::connection() -> prepare('SELECT id FROM Category WHERE name = :category LIMIT 1');
 		$query -> execute(array('category' => $category));
@@ -21,6 +22,8 @@ class Recipe extends BaseModel {
 	}
 
 	public function save() {
+		//add what to do if there's already a drink with that name.
+
 		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions) VALUES (:name, :category, :instructions) RETURNING id;');
 		$query -> execute(array('name' => $this->name, 'category' => $this->category, 'instructions' => $this->instructions));
 
@@ -82,16 +85,14 @@ class Recipe extends BaseModel {
 		$rows = $query -> fetchAll();
 
 		$ingredients = array();
-		$name = "n";
-		$category = "c";
-		$instructions = "i";
 
+		//what to do if there is no drink with the given id
 		foreach($rows as $row) {
 			if($row['ingredient'] != null) {
 				$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
 			}
 			
-			//should do for one row only
+			//should do this for one row only
 			$name = $row['name'];
 			$category = $row['category'];
 			$instructions =  $row['instructions'];
