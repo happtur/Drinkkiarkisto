@@ -11,11 +11,13 @@
 	</thead>
 
 	<tbody>
+		{% for recipe in recipes %}
 		<tr>
-		<td><a href="drink/1">Cuba Libre</a></td>
-			<td>Cocktail</td>
-			<td>3</td>
+		<td><a href="{{base path}}/drink/{{recipe.id}}">{{recipe.name}}</a></td>
+			<td>{{recipe.category}}</td>
+			<td>{{recipe.numberOfIngredients}}</td>
 		</tr>
+		{% endfor %}
 	</tbody>
 </table>
 

@@ -9,14 +9,14 @@
   });
 
   $routes->get('/drinks', function() {
-  	HelloWorldController::list_drinks();
+  	RecipeController::list_drinks();
   });
 
-  $routes->get('/drink/1', function() {
-  	HelloWorldController::show_drink();
+  $routes->get('/drink/:id', function($id) {
+  	RecipeController::show_drink($id);
   });
 
-  $routes->get('/drink/1/edit', function() {
-  	HelloWorldController::edit_drink();
+  $routes->get('/drink/:id/edit', function($id) {
+  	HelloWorldController::edit_drink($id);
   });
 

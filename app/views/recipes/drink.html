@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Cuba Libre</h1>
+<h1>{{recipe.name}}</h1>
 
 <p>Category: Cocktail</p>
 
 <table class="table table-condensed table-striped">
 	<tbody>
+
 		<tr>
 			<td>12 cl</td>
 			<td>Cola</td>
@@ -29,7 +30,7 @@
 <br>
 
 <p>
-	<a href="/tietokantasovellus/drink/1/edit" class="btn btn-primary btn-sm">Edit</a>
+	<a href="/{{base path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
 </p>
 
 {% endblock %}
