@@ -8,29 +8,23 @@
 <table class="table table-condensed table-striped">
 	<tbody>
 
+	{% for ingredient in recipe.ingredients %}
 		<tr>
-			<td>12 cl</td>
-			<td>Cola</td>
+			<td>{{ingredient.amount}}</td>
+			<td>{{ingredient.name}}</td>
 		</tr>
-		<tr>
-			<td>5 cl</td>
-			<td>Light rum</td>
-		</tr>
-		<tr>
-			<td>1 cl</td>
-			<td>Lime juice</td>
-		</tr>
+	{% endfor %}
 	</tbody>
 </table>
 
 <p>
-	Squeeze a lime into a Collins glass, add 2 or 3 ice cubes, and pour in the rum. Fill with cold Coca-Cola. Stir briefly.
+	{{recipe.instructions}}
 </p>
 
 <br>
 
 <p>
-	<a href="/{{base path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
+	<a href="/{{base_path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
 </p>
 
 {% endblock %}

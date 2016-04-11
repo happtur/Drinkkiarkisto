@@ -1,7 +1,7 @@
 <?php
 
 class Recipe extends BaseModel {
-	public $id, $name, $category, $instructions, $numberOfIngredients, $ingredients, $amounts;
+	public $id, $name, $category, $instructions, $numberOfIngredients, $ingredients;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -42,10 +42,8 @@ class Recipe extends BaseModel {
 		$rows = $query -> fetchAll();
 
 		$ingredients = array();
-		$amounts = array();
 		foreach($rows as $row) {
-			$ingredients[] = $row['ingredient'];
-			$amounts[] = $row['amount'];
+			$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
 		}
 		
 
@@ -55,8 +53,7 @@ class Recipe extends BaseModel {
 			'name' => $row['name'],
 			'category' => $row['category'],
 			'instructions' => $row['instructions'],
-			'ingredients' => $ingredients,
-			'amounts' => $amounts
+			'ingredients' => $ingredients
 			));
 
 		return $recipe;
@@ -80,15 +77,16 @@ class Recipe extends BaseModel {
 
 	// 	if($row) {
 	// 		$id = $row['id'];
-	// 		$ingredientsAmounts = this -> ingredients($id);
+	// 		//$ingredientsAmounts = this -> ingredients($id);
 
 	// 		$recipe = new Recipe(array(
 	// 			'id' => $id,
 	// 			'name' => $row['name'],
 	// 			'category' => $row['category'],
 	// 			'instructions' => $row['instructions'],
-	// 			'ingredients' => array_keys($ingredientsAmounts),
-	// 			'amounts' => array_values($ingredientsAmounts)
+	//			'ingredientAmounts' => this -> ingredients($id)
+	// 			//'ingredients' => array_keys($ingredientsAmounts),
+	// 			//'amounts' => array_values($ingredientsAmounts)
 	// 			));
 
 	// 		return $recipe;
