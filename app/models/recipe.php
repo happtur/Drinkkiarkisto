@@ -12,7 +12,8 @@ class Recipe extends BaseModel {
 
 	//to be changed.. particularly the input (-> (?textfield with? )dropdown menu or sthg)
 	//move to category-class?
-	public static function category($category) {
+	//reason to be static?
+	public static function category_id($category) {
 		$query = DB::connection() -> prepare('SELECT id FROM Category WHERE name = :category LIMIT 1');
 		$query -> execute(array('category' => $category));
 
@@ -21,13 +22,15 @@ class Recipe extends BaseModel {
 		if($row) {
 			return $row['id'];
 		}
-		//else??
+		
+		return null;
 	}
 
 	public function save() {
+		$category_id = self::category_id($this->category);
 
 		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions) VALUES (:name, :category, :instructions) RETURNING id;');
-		$query -> execute(array('name' => $this->name, 'category' => $this->category, 'instructions' => $this->instructions));
+		$query -> execute(array('name' => $this->name, 'category' => $category_id, 'instructions' => $this->instructions));
 
 		$row = $query -> fetch();
 		$this->id = $row['id'];
@@ -35,7 +38,7 @@ class Recipe extends BaseModel {
 	}
 
 	public function addIngredient($ingredient) {
-		$ingId = $ingredient->getId();
+		$ingId = Ingredient::getId($ingredient->name);
 
 		if($ingId == -1) {
 
@@ -54,10 +57,25 @@ class Recipe extends BaseModel {
 	}
 
 	public function update() {
+		$query = DB::connection()->prepare('DELETE FROM Recipe_ingredient WHERE recipe= :id;');
+		$query->execute(array('id' => $this->id));
+
+		$category = self::category_id($this->category);
+
+		$query = DB::connection()->prepare('UPDATE Recipe SET name = :name, category = :category, instructions = :instructions WHERE id = :id;');
+		$query->execute(array('name' => $this->name, 'category' => $category, 'instructions' => $this->instructions, 'id' => $this->id));
+
+		foreach ($this->ingredients as $ingredient) {
+			$this->addIngredient($ingredient);
+		}
 
 	}
 
 	public function delete() {
+		$query = DB::connection()->prepare('DELETE FROM Recipe_ingredient WHERE recipe = :id;');
+		$query->execute(array('id' => $this->id));
+
+
 		$query = DB::connection()->prepare('DELETE FROM Recipe WHERE id = :id;');
 		$query->execute(array('id' => $this->id));
 	}

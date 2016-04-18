@@ -3,6 +3,10 @@
 
 <h1>Drinks</h1>
 
+{% if user_logged_in %}
+	<h4>What are you in the mood for today, {{user_logged_in.name}}?</h4>
+{% endif %}
+
 <table class="table table-bordered table-striped">
 	<thead>
 		<th>Name</th>
@@ -16,7 +20,11 @@
 			<td><a href="{{base_path}}/drink/{{recipe.id}}">{{recipe.name}}</a></td>
 			<td>{{recipe.category}}</td>
 			<td>{{recipe.numberOfIngredients}}</td>
-			<td><<a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+
+			<!-- user can still delete of course, since nothing stops them from going to /drink/:id/delete yet -->
+			{% if user_logged_in %}
+			<td><a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+			{% endif %}
 		</tr>
 		{% endfor %}
 	</tbody>

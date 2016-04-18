@@ -1,6 +1,6 @@
 <?php
 
-class User extends BaseModel() {
+class User extends BaseModel {
 	//boolean admin? - also in database
 	public $id, $name, $password, $validators;
 
@@ -49,6 +49,7 @@ class User extends BaseModel() {
 		return null;
 	}
 
+//when creating new 
 	public function validate_name() {
 		$errors = array();
 
@@ -65,7 +66,7 @@ class User extends BaseModel() {
 		$errors = array();
 
 		if(!parent::validate_string_length($this->password, 6)) {
-			$errors[] = "Password has to have at least 6 characters"
+			$errors[] = "Password has to have at least 6 characters";
 		}
 		
 		return $errors;

@@ -23,9 +23,11 @@
 
 <br>
 
+{% if user_logged_in %}
 <p>
 	<a href="{{base_path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
 	<a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
 </p>
+{% endif %}
 
 {% endblock %}

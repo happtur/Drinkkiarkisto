@@ -1,6 +1,6 @@
 <?php
 
-class User_controller extends BaseController() {
+class UserController extends BaseController {
 
 	public static function login() {
 		View::make('user/login.html');
@@ -10,15 +10,20 @@ class User_controller extends BaseController() {
 		//password crypt()
 		$params = $_POST;
 
-		$user = USER::authenticate($params['name'], $params['password']);
+		$user = User::authenticate($params['name'], $params['password']);
 
-		if(!user) {
+		if(is_null($user)) {
 			View::make('user/login.html', array('error' => "The password doesn't match the username", 'username' => $params['name']));
 
 		} else {
 			$_SESSION['user'] = $user->id;
-			Redirect::to('/', array('success' => 'Welcome back ' . $user->name))
+			Redirect::to('/', array('success' => 'Welcome back ' . $user->name));
 		}
+	}
+
+	public static function logout() {
+		$_SESSION['user'] = null;
+		Redirect::to('/', array('message' => 'Redirected, hah, now how does that feel? Maybe you think twice about logging out next time...'));
 	}
 
 //add to routes (newuser), create view (can combine log in and add, buttontext and heading as parameter)

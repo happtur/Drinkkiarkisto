@@ -1,5 +1,6 @@
 <?php
 
+//fix helloworld :D
 $routes->get('/', function() {
   HelloWorldController::index();
 });
@@ -14,6 +15,10 @@ $routes->get('/login', function() {
 
 $routes->post('/login', function() {
   UserController::handle_login();
+});
+
+$routes->post('/logout', function() {
+  UserController::logout();
 });
 
 $routes->get('/drinks', function() {
@@ -36,8 +41,16 @@ $routes->post('/drink/addingredient/:id', function($id) {
   RecipeController::store_ingredient($id);
 });
 
+$routes->get('/drink/:id/edit/temp', function($id) {
+  RecipeController::edit_drink($id, true);
+});
+
 $routes->get('/drink/:id/edit', function($id) {
-  RecipeController::edit_drink($id);
+  RecipeController::edit_drink($id, false);
+});
+
+$routes->post('/drink/:id/edit', function($id) {
+  RecipeController::update($id);
 });
 
 $routes->get('/drink/:id/delete', function($id) {

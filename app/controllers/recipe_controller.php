@@ -13,14 +13,62 @@ class RecipeController extends BaseController {
 	}
 
 	
-	public static function edit_drink($id) {
-		$recipe = Recipe::findOne($id);
-		View::make('recipes/edit_drink.html', array('recipe' => $recipe));
+	public static function edit_drink($id, $already_changed) {
+		if(!$already_changed) {
+			$recipe = Recipe::findOne($id);
+			View::make('recipes/edit_drink.html', array('recipe' => $recipe));
+		}
+
+		View::make('recipes/edit_drink.html');
 	}
 
 	//"form within a form",google and/or addingredientbutton -> .../edit/addingredient, save -> .../edit. attributes from all, ingredients separately. somehow change edit_drink or have a separate .../edit/temp (because ingredients could have been "deleted")
-	public static function update($id) {
+	//messy, messy, messy
+	//everything lost if doesn't use add or save, i.e. works with 
+		$params = $_POST;
 
+		$ingredients = array();
+		$max_ing = (count($params) - 4) / 2;
+
+		for($i = 1; $i <= $max_ing; $i++) {
+			$si = 'ingr' . $i;
+
+			if(isset($params[$si])) {
+				$ing_name = $params[$si];
+				//bad name
+				$identifier = 'id' . Ingredient::getId($ing_name);
+				$ing_amount = $params[$identifier];
+				$ingredients[] = new Ingredient(array('name' => $ing_name, 'amount' => $ing_amount));
+			}
+		}
+
+		if($params['action'] == 'add') {
+			if(!empty($params['new_ingredient_name']) && !empty($params['new_ingredient_amount'])) {
+
+				$ingredients[] = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
+			}
+			$recipe = new Recipe(array(
+				'id' => $id,
+				'name' => $params['name'],
+				'category' => $params['category'],
+				'instructions' => $params['instructions'],
+				'ingredients' => $ingredients));
+
+			Redirect::to('/drink/' . $id . '/edit/temp', array('recipe' => $recipe));
+		} else {
+			$recipe = new Recipe(array(
+				'id' => $id,
+				'name' => $params['name'],
+				'category' => $params['category'],
+				'instructions' => $params['instructions'],
+				'ingredients' => $ingredients));
+
+			$recipe->update();
+
+			Redirect::to('/drink/' . $id, array('recipe' => $recipe, 'success' => 'Your changes were saved'));
+		}
+
+		Kint::dump($params);
 	}
 
 	public static function delete($id) {
@@ -42,21 +90,19 @@ class RecipeController extends BaseController {
 			'category' => $params['category'],
 			'instructions' => $params['instructions']);
 
-		$category = Recipe::category($params['category']);
-
-		$drink = new Recipe(array_merge($attributes, array('category' => $category));
+		$drink = new Recipe($attributes);
 
 		//does not check for category-error since that will be changed to 'choose from'-input
-			$errors = $drink->errors();
+		$errors = $drink->errors();
 
-			if(count($errors) == 0) {
-				$drink -> save();
+		if(count($errors) == 0) {
+			$drink -> save();
 
 			//temporary solution
-				Redirect::to('/drink/addingredient/' . $drink->id, array('success' => 'Nearly there :) just add some ingredients'));
-			} else {
-				Redirect::to('/drink/new', array('errors' => $errors, 'attributes' => $attributes));
-			}
+			Redirect::to('/drink/addingredient/' . $drink->id, array('success' => 'Nearly there :) just add some ingredients'));
+		} else {
+			Redirect::to('/drink/new', array('errors' => $errors, 'attributes' => $attributes));
+		}
 	}
 
 	//add_ingredient
@@ -85,7 +131,7 @@ class RecipeController extends BaseController {
 			Redirect::to('/drink/addingredient/' . $recipe->id, array('success' => 'Ingredient added'));
 
 		} else {
-			Redirect::to('/drink/addIngredient/'$id, array('errors' => $errors, 'attributes' => $attributes));
+			Redirect::to('/drink/addingredient/' . $id, array('errors' => $errors, 'attributes' => $attributes));
 		}
 	}
 }
