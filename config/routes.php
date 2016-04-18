@@ -8,28 +8,40 @@ $routes->get('/hiekkalaatikko', function() {
   HelloWorldController::sandbox();
 });
 
+$routes->get('/login', function() {
+  UserController::login();
+});
+
+$routes->post('/login', function() {
+  UserController::handle_login();
+});
+
 $routes->get('/drinks', function() {
  RecipeController::list_drinks();
 });
 
 $routes->get('/drink/new', function() {
-  RecipeController::create();
+  RecipeController::new_recipe_page();
 });
 
 $routes->post('/drink/new', function() {
-  RecipeController::store();
+  RecipeController::store_recipe();
 });
 
 $routes->get('/drink/addingredient/:id', function($id) {
-  RecipeController::addIngredientsPage($id);
+  RecipeController::add_ingredient_page($id);
 });
 
 $routes->post('/drink/addingredient/:id', function($id) {
-  RecipeController::storeIngredient($id);
+  RecipeController::store_ingredient($id);
 });
 
 $routes->get('/drink/:id/edit', function($id) {
   RecipeController::edit_drink($id);
+});
+
+$routes->get('/drink/:id/delete', function($id) {
+	RecipeController::delete($id);
 });
 
 $routes->get('/drink/:id', function($id) {

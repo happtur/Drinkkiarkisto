@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+{% if success %}
+	<div class="alert alert-success">
+	{{success}}
+	</div>
+{% endif %}
+
 <div class="page-header">
 	<h1>Welcome to the drinkkiarkisto</h1>
 </div>

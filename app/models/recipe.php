@@ -1,10 +1,13 @@
 <?php
 
+//everything is messy and long as fuck.
 class Recipe extends BaseModel {
-	public $id, $name, $category, $instructions, $numberOfIngredients, $ingredients;
+	public $id, $name, $category, $instructions, $numberOfIngredients, $ingredients, $validators;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
+
+		$this->validators = array('validate_name', 'validate_instructions');
 	}
 
 	//to be changed.. particularly the input (-> (?textfield with? )dropdown menu or sthg)
@@ -22,7 +25,6 @@ class Recipe extends BaseModel {
 	}
 
 	public function save() {
-		//add what to do if there's already a drink with that name.
 
 		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions) VALUES (:name, :category, :instructions) RETURNING id;');
 		$query -> execute(array('name' => $this->name, 'category' => $this->category, 'instructions' => $this->instructions));
@@ -50,10 +52,24 @@ class Recipe extends BaseModel {
 		$ingredients = $this->ingredients;
 		$ingredients[] = $ingredient;
 	}
+
+	public function update() {
+
+	}
+
+	public function delete() {
+		$query = DB::connection()->prepare('DELETE FROM Recipe WHERE id = :id;');
+		$query->execute(array('id' => $this->id));
+	}
 	
 
 	public static function findAll() {
-		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Recipe.instructions AS instructions, Ingredients.number_of_ingredients AS number_of_ingredients FROM Recipe LEFT JOIN Category ON Recipe.category = Category.id LEFT JOIN (SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients ON Ingredients.recipe = Recipe.id;');
+		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Recipe.instructions AS instructions, Ingredients.number_of_ingredients AS number_of_ingredients 
+			FROM Recipe 
+			LEFT JOIN Category ON Recipe.category = Category.id 
+			LEFT JOIN 
+			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
+			ON Ingredients.recipe = Recipe.id;');
 		$query -> execute();
 
 		$rows = $query -> fetchAll();
@@ -108,11 +124,47 @@ class Recipe extends BaseModel {
 			));
 
 		return $recipe;
-		
-
-		return null;
 	}
 
+
+	public function validate_name() {
+		$errors = array();
+
+		if (!$this->validate_string_length($this->name, 1)) {
+			$errors[] = 'The drink must have a name';
+
+		} elseif (!$this->name_available()) {
+			$errors[] = "There's already a drink with that name";
+
+		}
+
+		return $errors;
+	}
+
+	private function name_available() {
+		$query = DB::connection() -> prepare('SELECT id FROM Recipe 
+			WHERE name = :name LIMIT 1;');
+		$query -> execute(array('name' => $this->name));
+
+		$row = $query->fetch();
+		if($row) {
+			return false;
+		}
+		
+		return true;
+		
+	}
+
+	public function validate_instructions() {
+		$errors = array();
+
+		if(!$this->validate_string_length($this->instructions, 3)) {
+			$errors[] = 'The instructions must consist of at least three characters';
+		}
+
+		return $errors;
+
+	}
 
 
 
@@ -165,4 +217,4 @@ class Recipe extends BaseModel {
 
 	// 	return $ingredients;
 	// }
-}
+	}
