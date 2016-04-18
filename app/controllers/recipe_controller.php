@@ -24,7 +24,8 @@ class RecipeController extends BaseController {
 
 	//"form within a form",google and/or addingredientbutton -> .../edit/addingredient, save -> .../edit. attributes from all, ingredients separately. somehow change edit_drink or have a separate .../edit/temp (because ingredients could have been "deleted")
 	//messy, messy, messy
-	//everything lost if doesn't use add or save, i.e. works with 
+	//everything lost if doesn't use add or save
+	public static function update($id) {
 		$params = $_POST;
 
 		$ingredients = array();
