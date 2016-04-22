@@ -22,7 +22,7 @@
 			<td>{{recipe.numberOfIngredients}}</td>
 
 			<!-- user can still delete of course, since nothing stops them from going to /drink/:id/delete yet.-->
-			<!--make prettier, obviously. plus that if happens for every recipe -->
+			<!--make prettier, obviously. plus that it checks user for every recipe -->
 			{% if user_logged_in %}
 				{% if user_logged_in.admin == true %}
 					<td><a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>

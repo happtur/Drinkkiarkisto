@@ -48,15 +48,15 @@ class UserController extends BaseController {
 		}
 	}
 
+	//atm list shows number of all recipes, should change to approved/total?
 	public static function list_all() {
-
 		//check if admin
 
 		$users = User::all();
 		View::make('user/list', array('users' => $users));
 	}
 
-	//if you want the name displayed....
+	//if you want the name displayed make user-object...
 	public static function delete($id) {
 		//check if admin
 

@@ -1,7 +1,8 @@
 <?php
 
-//change Redirect to view when same url dumbass :D
 class RecipeController extends BaseController {
+
+	//going to fix the copy paste eventually
 
 	public static function list_drinks() {
 		$recipes = Recipe::findAll();
@@ -21,8 +22,6 @@ class RecipeController extends BaseController {
 	}
 
 
-	//messy, messy, messy
-	//everything lost if doesn't use add or save
 	public static function update($id) {
 		$params = $_POST;
 
@@ -358,8 +357,11 @@ class RecipeController extends BaseController {
 	public static function suggestions() {
 		//check if admin
 
+		$suggestions = Recipe::suggestions();
+		View::make('/recipes/list_suggestions.html', array('recipes' => $suggestions));
 		
-
+		//View suggestionlist (like list, without delete, without newbutton and with namelink---> viewsuggestion)
+			//should it show who added it? should list? then I would have to change recipe->user to User instead of int.
 	}
 
 }

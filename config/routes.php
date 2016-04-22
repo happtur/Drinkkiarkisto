@@ -45,6 +45,7 @@ $routes->get('/drinks', function() {
  RecipeController::list_drinks();
 });
 
+//change all /drink/suggestion/... to /suggestion/...?
 $routes->get('/drink/suggestion/:id/delete', function($id) {
   RecipeController::delete($id);
 });
