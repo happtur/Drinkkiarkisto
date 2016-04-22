@@ -1,5 +1,7 @@
 <?php
 
+
+//BOOLEAN
 class Recipe extends BaseModel {
 	public $id, $name, $category, $instructions, $added_by, $ingredients, $numberOfIngredients, $validators;
 
@@ -17,8 +19,15 @@ class Recipe extends BaseModel {
 	public function save($approved) {
 		$category_id = Category::getId($this->category);
 
-		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions, approved, added_by) VALUES (:name, :category, :instructions, :approved, :added_by) RETURNING id;');
-		$query -> execute(array('name' => $this->name, 'category' => $category_id, 'instructions' => $this->instructions, 'approved' => $approved, 'added_by' => $this->added_by));
+		if($approved) {
+
+			$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions, approved, added_by) VALUES (:name, :category, :instructions, true, :added_by) RETURNING id;');
+
+		} else {
+
+			$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions, approved, added_by) VALUES (:name, :category, :instructions, false, :added_by) RETURNING id;');
+		}
+		$query -> execute(array('name' => $this->name, 'category' => $category_id, 'instructions' => $this->instructions, 'added_by' => $this->added_by));
 
 		$row = $query -> fetch();
 		$this->id = $row['id'];
@@ -46,7 +55,7 @@ class Recipe extends BaseModel {
 
 			//move to ingredient? $ingredient->addToRecipe($recipe_id)
 			$query = DB::connection()->prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:recipe, :ingredient, :amount);');
-			$query->execute(array('recipe' => $this->id, 'ingredient' => $ingredient->name, 'amount' => $ingredient->amount));
+			$query->execute(array('recipe' => $this->id, 'ingredient' => $ingredient->id, 'amount' => $ingredient->amount));
 		}
 	}
 
@@ -63,8 +72,27 @@ class Recipe extends BaseModel {
 	//only returns approved recipes
 	//to implement: order by
 	public static function findAll() {
-		//boolean...
-		return self::allWithApprovedStatus(true);
+		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 
+			FROM Recipe 
+			LEFT JOIN Category ON Recipe.category = Category.id 
+			LEFT JOIN 
+			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
+			ON Ingredients.recipe = Recipe.id 
+			WHERE Recipe.approved = true;');
+		$query -> execute(array());
+
+		$rows = $query -> fetchAll();
+		$recipes = array();
+
+		foreach($rows as $row) {
+			$recipes[] = new Recipe(array(
+				'id' => $row['id'],
+				'name' => $row['name'],
+				'category' => $row['category'],
+				'numberOfIngredients' => $row['number_of_ingredients']));
+		}
+
+		return $recipes;
 	}
 
 

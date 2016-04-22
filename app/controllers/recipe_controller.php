@@ -1,5 +1,7 @@
 <?php
 
+//validate instructions doesn't work when edit, new, suggest
+
 class RecipeController extends BaseController {
 
 	//going to fix the copy paste eventually
@@ -84,7 +86,7 @@ class RecipeController extends BaseController {
 			$errors = $recipe->errors();
 
 			if(count($errors) == 0) {
-				$recipe.update();
+				$recipe->update();
 
 				if(Recipe::isApproved($id)) { 
 					Redirect::to('/drink/' . $id, array('success' => 'The changes were saved'));
@@ -139,7 +141,7 @@ class RecipeController extends BaseController {
 
 	public static function new_recipe_page() {
 		//View::make('recipes/drink_form.html', array('type' => "new"));
-		View::make('recipes/new_drink');
+		View::make('recipes/new_drink.html');
 	}
 
 	//does not check for category-error since that will be changed to 'choose from'-input
@@ -204,8 +206,8 @@ class RecipeController extends BaseController {
 			$errors = $recipe->errors();
 
 			if(count($errors) == 0) {
-				$recipe.save(true);
-				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' $recipe->name ', successfully added'));
+				$recipe->save(true);
+				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' . $recipe->name . ', successfully added'));
 
 			} else {
 				View::make('recipes/new_drink', array('recipe' => $recipe, 'errors' => $errors));
@@ -308,12 +310,13 @@ class RecipeController extends BaseController {
 			$errors = $recipe->errors();
 
 			if(count($errors) == 0) {
-				$recipe.save(false);
-				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' $recipe->name ', successfully added'));
+				$recipe->save(false);
+				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink suggestion, ' . $recipe->name . ', sent'));
 
 			} else {
 				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors));
 			}
+		}
 
 		//save checkbox ingredients
 		//which action?

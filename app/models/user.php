@@ -108,7 +108,7 @@ class User extends BaseModel {
 		$query->execute(array('id' => $id));
 
 		$query = DB::connection()->prepare('DELETE FROM Service_user WHERE id = :id;');
-		$query->execute(array('id') => $id);
+		$query->execute(array('id' => $id));
 	}
 
 	public static function make_admin($id) {

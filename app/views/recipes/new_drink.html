@@ -17,8 +17,50 @@
 <h1>New Drink</h1>
 <br>
 
+<form method="post" action="{{base_path}}/drink/new">
+	<div class="form-group">
+		<label for="inputName">Name</label>
+		<input type="text" class="form-control" id="inputName" name="name" value="{{recipe.name}}"></input>
+	</div>
+	<div class="form-group">
+		<label>Category</label>
+		<input type="text" class="form-control" name="category" value={{recipe.category}}></input>
+	</div>
 
-{{forms.drink_form({{recipe}}, "#{base_path}/drink/new")}}
+
+	<div class="form-group">
+		<label>Ingredients</label>
+
+		{% set counter = 1 %}
+		{% for ingredient in recipe.ingredients %}
+
+		<div class="checkbox">
+			<label>
+			<input type="checkbox" name="ingr{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
+			</label>
+			<input type="text" class="form-control" name="id{{ingredient.id}}" value="{{ingredient.amount}}"></input>
+			<br>
+		</div>
+		
+		{% set counter = counter +1 %}
+		{% endfor %}		
+	</div>
+	<div class="form-group">
+		<label>Add ingredient</label>
+		<input type="text" class="form-control" name="new_ingredient_name" placeholder="Ingredient"></input>
+		<input type="text" class="form-control" name="new_ingredient_amount" placeholder="Amount"></input>
+		<button type="submit" class="btn btn-primary" name="action" value="add">Add</button>
+	</div>
+
+	<div class="form-group">
+		<label>Instructions</label>
+		<textarea class="form-control" name="instructions">  {{recipe.instructions}}
+		</textarea>
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary" name="action" value="save">Save</button>
+	</div>
+</form>
 
 
 {% endblock %}

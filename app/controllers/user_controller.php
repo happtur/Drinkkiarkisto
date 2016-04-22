@@ -41,7 +41,7 @@ class UserController extends BaseController {
 		if(count($errors) == 0) {
 			$user->save();
 			$_SESSION['user'] = $user->id;
-			Redirect::to('/', array('success' => 'User successfully added'))
+			Redirect::to('/', array('success' => 'User successfully added'));
 
 		} else {
 			View::make('user/new_user.html', array('errors' => $errors, 'username' => $user->name));

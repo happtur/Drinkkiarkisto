@@ -3,7 +3,8 @@
 ## Yleisiä linkkejä:
 
 - [Linkki sovellukseeni](http://andreaer.users.cs.helsinki.fi/tietokantasovellus/)
-  * Tunnus: Kalle, Salasana: Kalle123
+  * Tavallinen käyttäjä: Kalle, Salasana: Kalle123
+  * Ylläpitäjä: admin, Salasana: password
 - [Linkki dokumentaatiooni](doc/dokumentaatio.pdf)
 
 ## Työn aihe

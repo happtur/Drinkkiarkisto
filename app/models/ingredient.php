@@ -14,9 +14,12 @@ class Ingredient extends BaseModel {
 
 	public function saveIfNeeded() {
 		if($this->id == -1) {
-			$query = DB::connection()->prepare('INSERT INTO Ingredient (id, name) 
-				VALUES (:id, :name);');
-			$query->execute(array('id' => $this->id, 'name' => $this->name));
+			$query = DB::connection()->prepare('INSERT INTO Ingredient (name) 
+				VALUES (:name) RETURNING id;');
+			$query->execute(array('name' => $this->name));
+
+			$row = $query->fetch();
+			$this->id = $row['id'];
 		}
 	}
 
