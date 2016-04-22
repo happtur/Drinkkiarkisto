@@ -23,27 +23,62 @@ class UserController extends BaseController {
 
 	public static function logout() {
 		$_SESSION['user'] = null;
-		Redirect::to('/', array('message' => 'Redirected, hah, now how does that feel? Maybe you think twice about logging out next time...'));
+		Redirect::to('/', array('message' => 'Logged out'));
 	}
 
-//add to routes (newuser), create view (can combine log in and add, buttontext and heading as parameter)
-	// public static function handle_add_user() {
-	// 	$params = $_POST;
+	public static function new_user() {
+		View::make('user/new_user.html');
+	}
 
-	// 	$user = new User(array('name' => $params['name'], 'password' => $params['password']));
 
-	// 	$errors = $user->errors();
+	public static function handle_new_user() {
+		$params = $_POST;
 
-	// 	if(count($errors) == 0) {
-	// 		$user->save();
-	//		Redirect::to('/', array('success' => 'User added successfully'))
-	// 	} else {
-	// 		Redirect::to('/newuser', array('errors' => $errors));
-	// 	}
-	// }
+		$user = new User(array('name' => $params['name'], 'password' => $params['password']));
 
-	// public static function new_user() {
-	// 	View::make('user/new_user.html');
-	// }
+		$errors = $user->errors();
+
+		if(count($errors) == 0) {
+			$user->save();
+			$_SESSION['user'] = $user->id;
+			Redirect::to('/', array('success' => 'User successfully added'))
+
+		} else {
+			View::make('user/new_user.html', array('errors' => $errors, 'username' => $user->name));
+		}
+	}
+
+	public static function list_all() {
+
+		//check if admin
+
+		$users = User::all();
+		View::make('user/list', array('users' => $users));
+	}
+
+	//if you want the name displayed....
+	public static function delete($id) {
+		//check if admin
+
+		User::delete($id);
+		Redirect::to('/', array('success' => 'User was successfully deleted'));
+	}
+
+	//if you want the name displayed....
+	public static function make_admin($id) {
+		//check if admin
+
+		User::make_admin($id);
+		Redirect::to('/', array('success' => 'User was successfully made an admin'));
+	}
+
+	//do I want this?
+		//no: remove from routes
+		//yes: add links to user/list.html
+	public static function show_user($id) {
+		//check if admin or user in question
+
+		//user.html (name, adminstatus, added recipes, change password(only user in question))
+	}
 
 }

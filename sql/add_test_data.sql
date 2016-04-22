@@ -13,14 +13,17 @@ INSERT INTO Ingredient (name) VALUES ('soda water');
 
 INSERT INTO Category (name) VALUES ('Cocktail');
 INSERT INTO Category (name) VALUES ('Shot');
+INSERT INTO Category (name) VALUES ('Punch');
+INSERT INTO Category (name) VALUES ('Non-alcoholic');
+INSERT INTO Category (name) VALUES ('Coffee/Cocoa');
 
-INSERT INTO Recipe (name, category, instructions) VALUES ('Cuba Libre', 1,
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Cuba Libre', 1, true, 1,
 	'Squeeze a lime into a Collins glass, add 2 or 3 ice cubes, and pour in the rum. Fill with cold Coca-Cola. Stir briefly.');
 
-INSERT INTO Recipe (name, category, instructions) VALUES ('Dry Martini', 1,
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Dry Martini', 1, true, 3,
 	'Straight: Pour all ingredients into mixing glass with ice cubes. Stir well. Strain in chilled martini cocktail glass. Garnish with olive.');
 
-INSERT INTO Recipe (name, category, instructions) VALUES ('Mojito', 1,
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Mojito', 1, true, 1,
 	'Muddle mint leaves with sugar and lime juice. Add a splash of soda water and fill the glass with cracked ice. Pour the rum and top with soda water. Garnish and serve with straw.');
 
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (2, 1, '12 cl');
@@ -39,6 +42,5 @@ INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (10, 3, 'to ta
 
 INSERT INTO Service_user (name, password) VALUES ('Kalle', 'Kalle123');
 INSERT INTO Service_user (name, password) VALUES ('name', 'password');
-
-
+INSERT INTO Service_user (name, password, admin) VALUES ('admin', 'password', true);
 

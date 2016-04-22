@@ -12,7 +12,9 @@ CREATE TABLE Recipe(
 	id SERIAL PRIMARY KEY,
 	name varchar(50) UNIQUE NOT NULL,
 	category INTEGER REFERENCES Category(id),
-	instructions varchar(600)
+	instructions varchar(600),
+	approved boolean NOT NULL,
+	added_by INTEGER REFERENCES Service_user(id)
 );
 
 CREATE TABLE Recipe_ingredient(
@@ -24,5 +26,6 @@ CREATE TABLE Recipe_ingredient(
 CREATE TABLE Service_user(
 	id SERIAL PRIMARY KEY,
 	name varchar(50) UNIQUE NOT NULL,
-	password varchar(50) NOT NULL
+	password varchar(50) NOT NULL,
+	admin boolean DEFAULT false
 );

@@ -1,0 +1,72 @@
+{% macro drink_form(recipe, action, button_text) %}
+
+<form method="post" action="{{action}}">
+	<div class="form-group">
+		<label for="inputName">Name</label>
+		<input type="text" class="form-control" id="inputName" name="name" value="{{recipe.name}}"></input>
+	</div>
+	<div class="form-group">
+		<label>Category</label>
+		<input type="text" class="form-control" name="category" value={{recipe.category}}></input>
+	</div>
+
+
+	<div class="form-group">
+		<label>Ingredients</label>
+
+		{% set counter = 1 %}
+		{% for ingredient in recipe.ingredients %}
+
+		<div class="checkbox">
+			<label>
+			<input type="checkbox" name="ingr{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
+			</label>
+			<input type="text" class="form-control" name="id{{ingredient.id}}" value="{{ingredient.amount}}"></input>
+			<br>
+		</div>
+		
+		{% set counter = counter +1 %}
+		{% endfor %}		
+	</div>
+	<div class="form-group">
+		<label>Add ingredient</label>
+		<input type="text" class="form-control" name="new_ingredient_name" placeholder="Ingredient"></input>
+		<input type="text" class="form-control" name="new_ingredient_amount" placeholder="Amount"></input>
+		<button type="submit" class="btn btn-primary" name="action" value="add">Add</button>
+	</div>
+
+	<div class="form-group">
+		<label>Instructions</label>
+		<textarea class="form-control" name="instructions">  {{recipe.instructions}}
+		</textarea>
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary" name="action" value="save">{{button_text|default('Save')}}</button>
+	</div>
+</form>
+
+{% endmacro %}
+
+
+
+<!-- how to use:
+{% import "macros/forms.html" as forms %}
+...
+  {{forms.name()}}
+...
+
+
+example:
+{% macro destroy_button(action, text) %}
+  <form method="post" action="{{action}}" style="display: inline-block;">
+    <button type="submit" class="btn btn-danger">{{text|default('Poista')}}</button>
+  </form>
+{% endmacro %}
+
+{% import "macros/forms.html" as forms %}
+<h1>{{game.name}}</h1>
+<p>
+  {{forms.destroy_button("#{base_path}/game/#{game.id}/destroy")}}
+  <a href="{{base_path}}/game/{{game.id}}/edit" class="btn btn-default">Muokkaa</a>
+</p>
+... -->

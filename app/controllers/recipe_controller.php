@@ -1,5 +1,6 @@
 <?php
 
+//change Redirect to view when same url dumbass :D
 class RecipeController extends BaseController {
 
 	public static function list_drinks() {
@@ -12,21 +13,20 @@ class RecipeController extends BaseController {
 		View::make('recipes/drink.html', array('recipe' => $recipe));
 	}
 
-	
-	public static function edit_drink($id, $already_changed) {
-		if(!$already_changed) {
-			$recipe = Recipe::findOne($id);
-			View::make('recipes/edit_drink.html', array('recipe' => $recipe));
-		}
+	public static function edit_drink($id) {
 
-		View::make('recipes/edit_drink.html');
+			$recipe = Recipe::findOne($id);
+			//View::make('recipes/drink_form.html', array('recipe' => $recipe, 'type' => "edit"));
+			View::make('recipes/edit_drink.html', array('recipe' => $recipe));
 	}
 
-	//"form within a form",google and/or addingredientbutton -> .../edit/addingredient, save -> .../edit. attributes from all, ingredients separately. somehow change edit_drink or have a separate .../edit/temp (because ingredients could have been "deleted")
+
 	//messy, messy, messy
 	//everything lost if doesn't use add or save
 	public static function update($id) {
 		$params = $_POST;
+
+		//check if admin
 
 		$ingredients = array();
 		$max_ing = (count($params) - 4) / 2;
@@ -44,10 +44,37 @@ class RecipeController extends BaseController {
 		}
 
 		if($params['action'] == 'add') {
-			if(!empty($params['new_ingredient_name']) && !empty($params['new_ingredient_amount'])) {
 
-				$ingredients[] = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
+			$newIngredient = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
+
+			$errors = $newIngredient->errors();
+
+			if(count($errors) == 0) {
+				$ingredients[] = $newIngredient;
+
+				$recipe = new Recipe(array(
+					'id' => $id,
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/edit_drink.html', array('recipe' => $recipe));
+
+			//change so the boxes display the attempted input-values
+			} else {
+				$recipe = new Recipe(array(
+					'id' => $id,
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'errors' => $errors));
 			}
+			
+		//else?
+		} else if($params['action'] == 'save') {
 			$recipe = new Recipe(array(
 				'id' => $id,
 				'name' => $params['name'],
@@ -55,84 +82,284 @@ class RecipeController extends BaseController {
 				'instructions' => $params['instructions'],
 				'ingredients' => $ingredients));
 
-			Redirect::to('/drink/' . $id . '/edit/temp', array('recipe' => $recipe));
-		} else {
-			$recipe = new Recipe(array(
-				'id' => $id,
-				'name' => $params['name'],
-				'category' => $params['category'],
-				'instructions' => $params['instructions'],
-				'ingredients' => $ingredients));
+			$errors = $recipe->errors();
 
-			$recipe->update();
+			if(count($errors) == 0) {
+				$recipe.update();
 
-			Redirect::to('/drink/' . $id, array('recipe' => $recipe, 'success' => 'Your changes were saved'));
+				if(Recipe::isApproved($id)) { 
+					Redirect::to('/drink/' . $id, array('success' => 'The changes were saved'));
+
+				} else {
+					Redirect::to('/drink/suggestion' . $id, array('success' => 'The changes were saved, but the suggested drink has not yet been approved'));
+				}
+
+				
+
+			} else {
+				View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+			}
 		}
 
-		Kint::dump($params);
+		//check if admin
+		//save checkbox ingredients
+		//which action?
+		//addIng:
+			//validateIng
+				//no errors
+					//add new ingredient to ingredients
+					//save attributes/recipe with original id
+					//display same page with 'recipe' => attributes including new ingredient
+				//error (including empty inputboxes)
+					//same page with error-alert, 'recipe' => attributes, not the new one (or keep it in the add-boxes?)
+		//save:
+			//create recipe-object with original id!, validate (->errors())
+				//no errors
+					//update recipe in database as approved
+					//load new drink's page
+				//error
+					//same page with error-alert, 'recipe' => attributes
+
 	}
 
 	public static function delete($id) {
+
+		//check if admin
+
 		$recipe = Recipe::findOne($id);
+		$approved = Recipe::isApproved($id);
 		$recipe->delete();
-		Redirect::to('/', array('success' => 'Drink ' . $recipe->name . ' has been deleted'));
+
+		if($approved) {
+			Redirect::to('/', array('success' => 'Drink ' . $recipe->name . ' has been deleted'));
+		} else {
+			Redirect::to('/', array('success' => 'Suggestion ' . $recipe->name . ' was dismissed'));
+		}
 	}
 
-	//create_recipe
+
 	public static function new_recipe_page() {
-		View::make('recipes/new_drink.html');
+		//View::make('recipes/drink_form.html', array('type' => "new"));
+		View::make('recipes/new_drink');
 	}
 
+	//does not check for category-error since that will be changed to 'choose from'-input
 	public static function store_recipe() {
-		//ingredients on separate page at first?
 		$params = $_POST;
 
-		$attributes = array('name' => $params['name'],
-			'category' => $params['category'],
-			'instructions' => $params['instructions']);
+		//check if is an admin
 
-		$drink = new Recipe($attributes);
+		$ingredients = array();
+		$max_ing = (count($params) - 4) / 2;
 
-		//does not check for category-error since that will be changed to 'choose from'-input
-		$errors = $drink->errors();
+		for($i = 1; $i <= $max_ing; $i++) {
+			$si = 'ingr' . $i;
 
-		if(count($errors) == 0) {
-			$drink -> save();
-
-			//temporary solution
-			Redirect::to('/drink/addingredient/' . $drink->id, array('success' => 'Nearly there :) just add some ingredients'));
-		} else {
-			Redirect::to('/drink/new', array('errors' => $errors, 'attributes' => $attributes));
+			if(isset($params[$si])) {
+				$ing_name = $params[$si];
+				//bad name
+				$identifier = 'id' . Ingredient::getId($ing_name);
+				$ing_amount = $params[$identifier];
+				$ingredients[] = new Ingredient(array('name' => $ing_name, 'amount' => $ing_amount));
+			}
 		}
+
+		if($params['action'] == "add") {
+
+			$newIngredient = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
+
+			$errors = $newIngredient->errors();
+
+			if(count($errors) == 0) {
+				$ingredients[] = $newIngredient;
+
+				$recipe = new Recipe(array(
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/new_drink', array('recipe' => $recipe));
+
+				//change so it keeps the faulty input in the boxes.
+			} else {
+				$recipe = new Recipe(array(
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/new_drink', array('recipe' => $recipe, 'errors' => $errors));
+			}
+
+		//else?
+		} else if($params['action'] == "save") {
+
+			$recipe = new Recipe(array(
+				'name' => $params['name'],
+				'category' => $params['category'],
+				'instructions' => $params['instructions'],
+				'ingredients' => $ingredients,
+				'added_by' => self::get_user_logged_in()->id));
+
+			$errors = $recipe->errors();
+
+			if(count($errors) == 0) {
+				$recipe.save(true);
+				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' $recipe->name ', successfully added'));
+
+			} else {
+				View::make('recipes/new_drink', array('recipe' => $recipe, 'errors' => $errors));
+			}
+		}
+
+		//check if admin
+		//save checkbox ingredients
+		//which action?
+		//addIng:
+			//validateIng
+				//no errors
+					//add new ingredient to ingredients
+					//save attributes/recipe
+					//display same page with 'recipe' => attributes including new ingredient
+				//error (including empty boxes)
+					//same page with error-alert, 'recipe' => attributes, not the new one (or keep it in the add-boxes?)
+		//save:
+			//create recipe-object (incl. user), validate (->errors())
+				//no errors
+					//save recipe in database AS APPROVED
+					//load new drink's page
+				//error
+					//same page with error-alert, 'recipe' => attributes
+
 	}
 
-	//add_ingredient
-	public static function add_ingredient_page($id) {
-		//one should be able to select from ingredients already in the database
-		//as well as adding new ones.
-		$id = (int) $id;
+
+
+
+	//move these into suggestionController?
+
+	public static function suggestNew() {
+		//View::make('recipes/drink_form.html', array('type' => "suggest_new"));
+		View::make('recipes/suggest_drink.html');
+	}
+	
+	public static function saveSuggestion() {
+
+		$params = $_POST;
+
+		$ingredients = array();
+		$max_ing = (count($params) - 4) / 2;
+
+		for($i = 1; $i <= $max_ing; $i++) {
+			$si = 'ingr' . $i;
+
+			if(isset($params[$si])) {
+				$ing_name = $params[$si];
+				//bad name
+				$identifier = 'id' . Ingredient::getId($ing_name);
+				$ing_amount = $params[$identifier];
+				$ingredients[] = new Ingredient(array('name' => $ing_name, 'amount' => $ing_amount));
+			}
+		}
+
+		if($params['action'] == "add") {
+
+			$newIngredient = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
+
+			$errors = $newIngredient->errors();
+
+			if(count($errors) == 0) {
+				$ingredients[] = $newIngredient;
+
+				$recipe = new Recipe(array(
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe));
+
+				//change so it keeps the faulty input in the boxes.
+			} else {
+				$recipe = new Recipe(array(
+					'name' => $params['name'],
+					'category' => $params['category'],
+					'instructions' => $params['instructions'],
+					'ingredients' => $ingredients));
+
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+			}
+
+		//else?
+		} else if($params['action'] == "save") {
+
+			$attributes = array(
+				'name' => $params['name'],
+				'category' => $params['category'],
+				'instructions' => $params['instructions'],
+				'ingredients' => $ingredients);
+
+			$user = self::get_user_logged_in();
+			if($user) {
+				$attributes['added_by'] = $user->id;
+			}
+
+			$recipe = new Recipe($attributes);
+			$errors = $recipe->errors();
+
+			if(count($errors) == 0) {
+				$recipe.save(false);
+				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' $recipe->name ', successfully added'));
+
+			} else {
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+			}
+
+		//save checkbox ingredients
+		//which action?
+		//addIng:
+			//validateIng
+				//no errors
+					//add new ingredient to ingredients
+					//save attributes/recipe with original id
+					//display same page with 'recipe' => attributes including new ingredient
+				//error (including empty inputboxes)
+					//same page with error-alert, 'recipe' => attributes, not the new one (or keep it in the add-boxes?)
+		//save:
+			//create recipe-object (incl. user, if there is one), validate (->errors())
+				//no errors
+					//save recipe in database as not approved
+					//load new drink's page
+				//error
+					//same page with error-alert, 'recipe' => attributes
+
+	}
+
+	//view not editable, has buttons:
+	//approve, dismiss, edit
+	//edit: save ---> approved OR **save ---> reload viewSuggestion with changes**
+	public static function viewSuggestion($id) {
+		//check if admin
+
 		$recipe = Recipe::findOne($id);
-
-		View::make('recipes/add_ingredient.html', array('recipe' => $recipe));
+		View::make('/recipes/suggestion.html', array('recipe' => $recipe));
 	}
 
-	public static function store_ingredient($id) {
-		$params = $_POST;
-		$attributes = array('name' => $params['name'], 'amount' => $params['amount']);
-		$ingredient = new Ingredient($attributes);
 
-		$errors = $ingredient->errors();
+	public static function approveSuggestion($id) {
+		//check if admin
 
-		if(count($errors) == 0) {
-
-			$recipe = Recipe::findOne($id);
-			$recipe->addIngredient($ingredient);
-
-
-			Redirect::to('/drink/addingredient/' . $recipe->id, array('success' => 'Ingredient added'));
-
-		} else {
-			Redirect::to('/drink/addingredient/' . $id, array('errors' => $errors, 'attributes' => $attributes));
-		}
+		Recipe::approve($id);
+		Redirect::to('/drink/' . $id, array('success' => 'Drink approved'));
 	}
+
+
+	public static function suggestions() {
+		//check if admin
+
+		
+
+	}
+
 }

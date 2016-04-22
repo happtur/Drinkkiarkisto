@@ -13,9 +13,10 @@
 	</div>
 {% endif %}
 
-<h1>Edit drink {{recipe.name}}</h1>
-<br>
 
-{{forms.drink_form({{recipe}}, "#{base_path}/drink/#{recipe.id}/edit", "Edit")}}
+<h1>Suggest drink</h1><br>
+
+{{forms.drink_form({{recipe}}, "#{base_path}/drink/suggestion/new", "Send")}}
+
 
 {% endblock %}

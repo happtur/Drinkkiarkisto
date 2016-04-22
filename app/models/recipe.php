@@ -1,8 +1,7 @@
 <?php
 
-//everything is messy and long as fuck.
 class Recipe extends BaseModel {
-	public $id, $name, $category, $instructions, $numberOfIngredients, $ingredients, $validators;
+	public $id, $name, $category, $instructions, $added_by, $ingredients, $numberOfIngredients, $validators;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -10,84 +9,69 @@ class Recipe extends BaseModel {
 		$this->validators = array('validate_name', 'validate_instructions');
 	}
 
-	//to be changed.. particularly the input (-> (?textfield with? )dropdown menu or sthg)
-	//move to category-class?
-	//reason to be static?
-	public static function category_id($category) {
-		$query = DB::connection() -> prepare('SELECT id FROM Category WHERE name = :category LIMIT 1');
-		$query -> execute(array('category' => $category));
+	//static findAll (alphabetical order) APPROVED
+	//static findAll (list by amount of ingredients) APPROVED
+	//static findAll (in category) APPROVED
 
-		$row = $query->fetch();
+	//static suggestions i.e. find all that haven't been approved
 
-		if($row) {
-			return $row['id'];
-		}
-		
-		return null;
-	}
 
-	public function save() {
-		$category_id = self::category_id($this->category);
+	public function save($approved) {
+		$category_id = Category::getId($this->category);
 
-		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions) VALUES (:name, :category, :instructions) RETURNING id;');
-		$query -> execute(array('name' => $this->name, 'category' => $category_id, 'instructions' => $this->instructions));
+		$query = DB::connection() -> prepare('INSERT INTO Recipe (name, category, instructions, approved, added_by) VALUES (:name, :category, :instructions, :approved, :added_by) RETURNING id;');
+		$query -> execute(array('name' => $this->name, 'category' => $category_id, 'instructions' => $this->instructions, 'approved' => $approved, 'added_by' => $this->added_by));
 
 		$row = $query -> fetch();
 		$this->id = $row['id'];
 
+		$this->saveIngredients();
 	}
 
-	public function addIngredient($ingredient) {
-		$ingId = Ingredient::getId($ingredient->name);
-
-		if($ingId == -1) {
-
-			$query = DB::connection() -> prepare('INSERT INTO Ingredient (name) VALUES (:ingredient) RETURNING id;');
-			$query -> execute(array('ingredient' => $ingredient->name));
-
-			$row = $query->fetch();
-			$ingId = $row['id'];
-		}
-
-		$query = DB::connection() -> prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:id, :ingredient, :amount)');
-		$query -> execute(array('id' => $this->id, 'ingredient' => $ingId, 'amount' => $ingredient->amount));
-
-		$ingredients = $this->ingredients;
-		$ingredients[] = $ingredient;
-	}
-
+	//removes all, adds all. Even if tiny change...
 	public function update() {
-		$query = DB::connection()->prepare('DELETE FROM Recipe_ingredient WHERE recipe= :id;');
+		$query = DB::connection()->prepare('DELETE FROM Recipe_ingredient WHERE recipe = :id;');
 		$query->execute(array('id' => $this->id));
 
-		$category = self::category_id($this->category);
+		$category = Category::getId($this->category);
 
 		$query = DB::connection()->prepare('UPDATE Recipe SET name = :name, category = :category, instructions = :instructions WHERE id = :id;');
 		$query->execute(array('name' => $this->name, 'category' => $category, 'instructions' => $this->instructions, 'id' => $this->id));
 
-		foreach ($this->ingredients as $ingredient) {
-			$this->addIngredient($ingredient);
-		}
-
+		$this->saveIngredients();
 	}
 
+	public function saveIngredients() {
+
+		foreach ($this->ingredients as $ingredient) {
+			$ingredient->saveIfNeeded();
+
+			//move to ingredient? $ingredient->addToRecipe($recipe_id)
+			$query = DB::connection()->prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:recipe, :ingredient, :amount);');
+			$query->execute(array('recipe' => $this->id, 'ingredient' => $ingredient->name, 'amount' => $ingredient->amount));
+		}
+	}
+
+	//to static?
 	public function delete() {
 		$query = DB::connection()->prepare('DELETE FROM Recipe_ingredient WHERE recipe = :id;');
 		$query->execute(array('id' => $this->id));
 
-
 		$query = DB::connection()->prepare('DELETE FROM Recipe WHERE id = :id;');
 		$query->execute(array('id' => $this->id));
 	}
-	
 
+
+	//only returns approved recipes
+	//to implement: order by
 	public static function findAll() {
 		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Recipe.instructions AS instructions, Ingredients.number_of_ingredients AS number_of_ingredients 
 			FROM Recipe 
 			LEFT JOIN Category ON Recipe.category = Category.id 
 			LEFT JOIN 
 			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
-			ON Ingredients.recipe = Recipe.id;');
+			ON Ingredients.recipe = Recipe.id 
+			WHERE Recipe.approved = true;');
 		$query -> execute();
 
 		$rows = $query -> fetchAll();
@@ -106,7 +90,6 @@ class Recipe extends BaseModel {
 	}
 
 
-	//combined
 	public static function findOne($id) {
 		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Recipe.instructions AS instructions, Category.name AS category, Recipe_ingredient.amount AS amount, Ingredient.name AS ingredient
 			FROM Recipe 
@@ -116,21 +99,39 @@ class Recipe extends BaseModel {
 			WHERE Recipe.id = :id;');
 
 		$query -> execute(array('id' => $id));
-		$rows = $query -> fetchAll();
 
+//1.
+		$row = $query->fetch();
 		$ingredients = array();
 
-		//what to do if there is no drink with the given id
-		foreach($rows as $row) {
+		$name = $row['name'];
+		$category = $row['category'];
+		$instructions = $row['instructions'];
+
+		while($row) {
 			if($row['ingredient'] != null) {
 				$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
 			}
-			
-			//should do this for one row only
-			$name = $row['name'];
-			$category = $row['category'];
-			$instructions =  $row['instructions'];
+			$row = $query->fetch();
 		}
+
+//2.
+		// $rows = $query -> fetchAll();
+
+		// $ingredients = array();
+
+		// //what to do if there is no drink with the given id
+		// foreach($rows as $row) {
+		// 	if($row['ingredient'] != null) {
+		// 		$ingredients[] = new Ingredient(array('name' => $row['ingredient'], 'amount' => $row['amount']));
+		// 	}
+			
+		// 	//should do this for one row only
+		// 	$name = $row['name'];
+		// 	$category = $row['category'];
+		// 	$instructions =  $row['instructions'];
+		// }
+//end
 		
 
 		$recipe = new Recipe(array(
@@ -142,6 +143,25 @@ class Recipe extends BaseModel {
 			));
 
 		return $recipe;
+	}
+
+
+	public static function approve($id) {
+		$query = DB::connection()->prepare('UPDATE Recipe SET approved = true WHERE id = :id;');
+		$query->execute(array('id' => $id));
+	}
+
+	public static function isApproved($id) {
+		$query = DB::connection()->prepare('SELECT approved FROM Recipe WHERE id = :id;');
+		$query->execute(array('id' => $id));
+		$row = $query->fetch();
+
+		//check what $row['approved'] returns! 
+		if($row and $row['approved'] == 't') {
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -165,7 +185,7 @@ class Recipe extends BaseModel {
 		$query -> execute(array('name' => $this->name));
 
 		$row = $query->fetch();
-		if($row) {
+		if($row and $row['id'] != $this->id) {
 			return false;
 		}
 		
@@ -184,55 +204,4 @@ class Recipe extends BaseModel {
 
 	}
 
-
-
-	// //apart
-	// public static function findOne($id) {
-	// 	$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Recipe.instructions AS instructions, Category.name AS category 
-	// 		FROM Recipe 
-	// 		LEFT JOIN Category ON Recipe.category = Category.id
-	// 		WHERE Recipe.id = :id;');
-
-	// 	$query -> execute(array('id' => $id));
-	// 	$row = $query -> fetch();
-
-	// 	if($row) {
-	// 		$id = $row['id'];
-	// 		//$ingredientsAmounts = this -> ingredients($id);
-
-	// 		$recipe = new Recipe(array(
-	// 			'id' => $id,
-	// 			'name' => $row['name'],
-	// 			'category' => $row['category'],
-	// 			'instructions' => $row['instructions'],
-	//			'ingredientAmounts' => this -> ingredients($id)
-	// 			//'ingredients' => array_keys($ingredientsAmounts),
-	// 			//'amounts' => array_values($ingredientsAmounts)
-	// 			));
-
-	// 		return $recipe;
-	// 	}
-
-	// 	return null;
-	// }
-
-	// private static function ingredients($id) {
-	// 	$query = DB::connection() -> prepare('SELECT Ingredient.name AS ingredient, RecipeIngredient.amount AS amount 
-	// 		FROM RecipeIngredient 
-	// 		LEFT JOIN Ingredient ON RecipeIngredient.ingredient = Ingredient.id 
-	// 		WHERE RecipeIngredient.recipe = :id;');
-
-	// 	$query -> execute(array('id' => $id));
-	// 	$rows = $query -> fetchAll();
-
-	// 	$ingredients = array();
-
-	// 	foreach($rows as $row) {
-
-	// 		$ingredient = (string) $row['ingredient'];
-	// 		array[] = $ingredient => $row['amount']
-	// 	}
-
-	// 	return $ingredients;
-	// }
-	}
+}

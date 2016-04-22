@@ -21,9 +21,12 @@
 			<td>{{recipe.category}}</td>
 			<td>{{recipe.numberOfIngredients}}</td>
 
-			<!-- user can still delete of course, since nothing stops them from going to /drink/:id/delete yet -->
+			<!-- user can still delete of course, since nothing stops them from going to /drink/:id/delete yet.-->
+			<!--make prettier, obviously. plus that if happens for every recipe -->
 			{% if user_logged_in %}
-			<td><a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+				{% if user_logged_in.admin == true %}
+					<td><a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+				{% endif %}
 			{% endif %}
 		</tr>
 		{% endfor %}
@@ -31,7 +34,11 @@
 </table>
 
 <p>
+{% if user_logged_in and user_logged_in.admin == true %}
 	<a href="{{base_path}}/drink/new" class="btn btn-primary btn-sm">Add drink</a>
+{% else %}
+	<a href="{{base_path}}/drink/suggestion/new" class="btn btn-primary btn-sm">Suggest new drink</a>
+{% endif %}
 </p>
 
 {% endblock %}

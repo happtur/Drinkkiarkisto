@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Users</h1>
+
+<table class="table table-bordered table-striped">
+	<thead>
+		<th>Name</th>
+		<th>Admin</th>
+		<th>Number of recipes added</th>
+	</thead>
+
+	<tbody>
+		{% for user in users %}
+		<tr>
+			<td>{{user.name}}</td>
+			<td>{{user.admin}}</td>
+			<td>{{user.recipes_added}}</td>
+
+			<td><a href="{{base_path}}/user/{{user.id}}/makeadmin" class="btn btn-success btn-sm">Make admin</a></td>
+			<td><a href="{{base_path}}/user/{{user.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
