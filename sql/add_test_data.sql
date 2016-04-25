@@ -15,7 +15,7 @@ INSERT INTO Category (name) VALUES ('Cocktail');
 INSERT INTO Category (name) VALUES ('Shot');
 INSERT INTO Category (name) VALUES ('Punch');
 INSERT INTO Category (name) VALUES ('Non-alcoholic');
-INSERT INTO Category (name) VALUES ('Coffee/Cocoa');
+INSERT INTO Category (name) VALUES ('Hot beverage');
 
 INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Cuba Libre', 1, true, 1,
 	'Squeeze a lime into a Collins glass, add 2 or 3 ice cubes, and pour in the rum. Fill with cold Coca-Cola. Stir briefly.');

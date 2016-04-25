@@ -78,9 +78,9 @@ class User extends BaseModel {
 	}
 
 	public static function all() {
-		$query = DB::connection()->prepare('SELECT Service_user.name AS name, Service_user.admin AS admin, Temp.recipes_added AS recipes_added 
+		$query = DB::connection()->prepare('SELECT Service_user.id AS id, Service_user.name AS name, Service_user.admin AS admin, Temp.recipes_added AS recipes_added 
 			FROM Service_user 
-			LEFT JOIN (SELECT added_by, COUNT(*) AS recipes_added FROM Recipe GROUP BY added_by) AS Temp ON Temp.added_by = Service_user.id;');
+			LEFT JOIN (SELECT added_by, COUNT(*) AS recipes_added FROM Recipe WHERE approved = true GROUP BY added_by) AS Temp ON Temp.added_by = Service_user.id;');
 		$query->execute();
 		$rows = $query->fetchAll();
 
@@ -95,6 +95,7 @@ class User extends BaseModel {
 			}
 
 			$users[] = new User(array(
+				'id' => $row['id'],
 				'name' => $row['name'],
 				'admin' => $admin,
 				'recipes_added' => $row['recipes_added']));
@@ -114,6 +115,11 @@ class User extends BaseModel {
 	public static function make_admin($id) {
 		$query = DB::connection()->prepare('UPDATE Service_user SET admin = true WHERE id = :id');
 		$query->execute(array('id' => $id));
+	}
+
+	public function change_password() {
+		$query = DB::connection()->prepare('UPDATE Service_user SET password = :password WHERE id = :id;');
+		$query->execute(array('password' => $this->password, 'id' => $this->id));
 	}
 
 

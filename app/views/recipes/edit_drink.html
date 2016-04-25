@@ -23,7 +23,15 @@
 	</div>
 	<div class="form-group">
 		<label>Category</label>
-		<input type="text" class="form-control" name="category" value={{recipe.category}}></input>
+		<select class="form-control" name="category">
+			{% for category in categories %}
+				{% if category is same as(recipe.category) %}
+					<option value="{{category}}" selected>{{category}}</option>
+				{% else %}
+					<option value="{{category}}">{{category}}</option>
+				{% endif %}}
+			{% endfor %}
+		</select>
 	</div>
 
 
@@ -35,9 +43,9 @@
 
 		<div class="checkbox">
 			<label>
-			<input type="checkbox" name="ingr{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
+			<input type="checkbox" name="ing_name{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
 			</label>
-			<input type="text" class="form-control" name="id{{ingredient.id}}" value="{{ingredient.amount}}"></input>
+			<input type="text" class="form-control" name="ing_amount{{counter}}" value="{{ingredient.amount}}"></input>
 			<br>
 		</div>
 		

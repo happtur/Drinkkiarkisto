@@ -40,6 +40,9 @@
         <ul class="nav navbar-nav">
           <!-- Navigaation linkit -->
           <li><a href="{{base_path}}/drinks">Drink Recipes</a></li>
+          {% if user_logged_in %}
+          <li><a href="{{base_path}}/user/{{user_logged_in.id}}">My page</a></li>
+          {% endif %}
         </ul>
 
         {% if user_logged_in %}

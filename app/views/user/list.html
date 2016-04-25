@@ -13,12 +13,15 @@
 	<tbody>
 		{% for user in users %}
 		<tr>
-			<td>{{user.name}}</td>
+			<td><a href="{{base_path}}/user/{{user.id}}">{{user.name}}</a></td>
 			<td>{{user.admin}}</td>
 			<td>{{user.recipes_added}}</td>
 
-			<td><a href="{{base_path}}/user/{{user.id}}/makeadmin" class="btn btn-success btn-sm">Make admin</a></td>
-			<td><a href="{{base_path}}/user/{{user.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+			<!-- checks for every user -->
+			{% if user_logged_in and user_logged_in.admin == true %}
+				<td><a href="{{base_path}}/user/{{user.id}}/makeadmin" class="btn btn-success btn-sm">Make admin</a></td>
+				<td><a href="{{base_path}}/user/{{user.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+			{% endif %}
 
 		</tr>
 		{% endfor %}

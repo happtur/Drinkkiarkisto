@@ -72,27 +72,7 @@ class Recipe extends BaseModel {
 	//only returns approved recipes
 	//to implement: order by
 	public static function findAll() {
-		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 
-			FROM Recipe 
-			LEFT JOIN Category ON Recipe.category = Category.id 
-			LEFT JOIN 
-			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
-			ON Ingredients.recipe = Recipe.id 
-			WHERE Recipe.approved = true;');
-		$query -> execute(array());
-
-		$rows = $query -> fetchAll();
-		$recipes = array();
-
-		foreach($rows as $row) {
-			$recipes[] = new Recipe(array(
-				'id' => $row['id'],
-				'name' => $row['name'],
-				'category' => $row['category'],
-				'numberOfIngredients' => $row['number_of_ingredients']));
-		}
-
-		return $recipes;
+		return self::allWithApprovedStatus(true);
 	}
 
 
@@ -153,20 +133,33 @@ class Recipe extends BaseModel {
 
 
 	public static function suggestions() {
-		//boolean
 		return self::allWithApprovedStatus(false);
 	}
 
 	//why instructions?
 	private static function allWithApprovedStatus($approved_status) {
-		$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 
+
+		if($approved_status) {
+			$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 
 			FROM Recipe 
 			LEFT JOIN Category ON Recipe.category = Category.id 
 			LEFT JOIN 
 			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
 			ON Ingredients.recipe = Recipe.id 
-			WHERE Recipe.approved = :status;');
-		$query -> execute(array('status' => $approved_status));
+			WHERE Recipe.approved = true;');
+
+		} else {
+			$query = DB::connection() -> prepare('SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 
+			FROM Recipe 
+			LEFT JOIN Category ON Recipe.category = Category.id 
+			LEFT JOIN 
+			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
+			ON Ingredients.recipe = Recipe.id 
+			WHERE Recipe.approved = false;');
+		}
+
+		
+		$query -> execute();
 
 		$rows = $query -> fetchAll();
 		$recipes = array();

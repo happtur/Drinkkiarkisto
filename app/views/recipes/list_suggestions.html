@@ -13,7 +13,7 @@
 	<tbody>
 		{% for recipe in recipes %}
 		<tr>
-			<td><a href="{{base_path}}/drink/suggestion{{recipe.id}}/approve">{{recipe.name}}</a></td>
+			<td><a href="{{base_path}}/drink/suggestion/{{recipe.id}}">{{recipe.name}}</a></td>
 			<td>{{recipe.category}}</td>
 			<td>{{recipe.numberOfIngredients}}</td>
 		</tr>

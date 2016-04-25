@@ -50,15 +50,15 @@ class UserController extends BaseController {
 
 	//atm list shows number of all recipes, should change to approved/total?
 	public static function list_all() {
-		//check if admin
+		self::check_logged_in_is_admin();
 
 		$users = User::all();
-		View::make('user/list', array('users' => $users));
+		View::make('user/list.html', array('users' => $users));
 	}
 
 	//if you want the name displayed make user-object...
 	public static function delete($id) {
-		//check if admin
+		self::check_logged_in_is_admin_or_has_id($id);
 
 		User::delete($id);
 		Redirect::to('/', array('success' => 'User was successfully deleted'));
@@ -66,19 +66,39 @@ class UserController extends BaseController {
 
 	//if you want the name displayed....
 	public static function make_admin($id) {
-		//check if admin
+		self::check_logged_in_is_admin();
 
 		User::make_admin($id);
 		Redirect::to('/', array('success' => 'User was successfully made an admin'));
 	}
 
-	//do I want this?
-		//no: remove from routes
-		//yes: add links to user/list.html
-	public static function show_user($id) {
-		//check if admin or user in question
 
-		//user.html (name, adminstatus, added recipes, change password(only user in question))
+	public static function show_user($id) {
+		self::check_logged_in_is_admin_or_has_id($id);
+
+		$user = User::find($id);
+		//find recipes
+		View::make('user/user.html', array('user' => $user));
+	}
+
+	public static function change_password($id) {
+		$user = self::get_user_logged_in();
+		if($user->id != $id) {
+			Redirect::to('/login', array('message' => "You can't change the password unless your logged in to that account!"));
+		}
+
+		$password = $_POST['password'];
+
+		$user = new User(array('id' => $id, 'password' => $password));
+		$errors = $user->validate_password();
+
+		if(count($errors) == 0) {
+			$user->change_password();
+			Redirect::to('/user/' . $id, array('success' => 'Password was changed'));
+		} else {
+			$user = User::find($id);
+			View::make('/user/user.html', array('errors' => $errors, 'user' => $user));
+		}
 	}
 
 }

@@ -19,14 +19,23 @@
 </div>
 
 <br>
-<p>
-	<a href="{{base_path}}/login" class="btn btn-default">Log in</a>
-</p>
 
+<div>
+	<a href="{{base_path}}/login" class="btn btn-primary btn-lg">Log in</a>
+	<a href="{{base_path}}/user/new" class="btn btn-primary btn-lg">Sign up</a>
+</div>
+
+{% if user_logged_in.admin == true %}
+	<br>
+	<div>
+		<a href="{{base_path}}/users" class="btn btn-primary btn-lg">List of users</a>
+		<a href="{{base_path}}/drink/suggestions" class="btn btn-primary btn-lg">Suggested drinks</a>
+	</div>
+{% endif %}
 
 <br>
 <br>
-<p>
-	<a href="" class="btn btn-primary btn-lg">Go to the search page</a>
-</p>
+
+<a href="" class="btn btn-primary btn-lg">Go to the search page</a>
+
 {% endblock %}

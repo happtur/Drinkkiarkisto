@@ -16,7 +16,16 @@ class Category extends BaseModel {
 	}
 
 	public static function all() {
+		$query = DB::connection()->prepare('SELECT name FROM Category;');
+		$query->execute();
+		$rows = $query->fetchAll();
 
+		$categories = array();
+		foreach ($rows as $row) {
+			$categories[] = $row['name'];
+		}
+
+		return $categories;
 	}
 
 }

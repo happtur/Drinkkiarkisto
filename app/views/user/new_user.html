@@ -17,11 +17,12 @@
 <form method="post" action="{{base_path}}/user/new">
 	<div class="form-group">
 		<label>Username</label>
-		<input type="text" class="form-control" name='name' value="{{username}}" placeholder="Username"></input>
+		<input type="text" class="form-control" name='name' value="{{username}}" placeholder="Username">
 	</div>
 	<div class="form-group">
+		<!-- should have to write password twice! -->
 		<label>Password</label>
-		<input type="password" class="form-control" name='password' placeholder="Password"></input>
+		<input type="password" class="form-control" name='password' placeholder="Password">
 	</div>
 
 	<button type="submit" class="btn btn-primary">Save</button>
