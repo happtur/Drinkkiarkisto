@@ -43,7 +43,11 @@
 		<div class="panel-body">
 			<div class="list-group">
 				{% for recipe in pending %}
+					{% if user_logged_in.admin == true %}
+					<a href="{{base_path}}/drink/suggestion/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
+					{% else %}
 					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
+					{% endif %}}
 				{% endfor %}
 			</div>
 		</div>
