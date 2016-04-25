@@ -14,6 +14,7 @@
 		{% for user in users %}
 		<tr>
 			<td><a href="{{base_path}}/user/{{user.id}}">{{user.name}}</a></td>
+			<!-- make pretty -->
 			<td>{{user.admin}}</td>
 			<td>{{user.recipes_added}}</td>
 
