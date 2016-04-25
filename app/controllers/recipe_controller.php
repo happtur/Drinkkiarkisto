@@ -34,21 +34,7 @@ class RecipeController extends BaseController {
 
 		$categories = Category::all();
 
-		$ingredients = array();
-		$max_ing = (count($params) - 4) / 2;
-
-		for($i = 1; $i <= $max_ing; $i++) {
-			$key_name = 'ing_name' . $i;
-
-			if(isset($params[$key_name])) {
-				$ing_name = $params[$key_name];
-
-				$key_amount = 'ing_amount' . $i;		
-				$ing_amount = $params[$key_amount];
-
-				$ingredients[] = new Ingredient(array('name' => $ing_name, 'amount' => $ing_amount));
-			}
-		}
+		$ingredients = $ingredients = self::old_ingredients($params);
 
 		if($params['action'] == 'add') {
 
@@ -147,8 +133,10 @@ class RecipeController extends BaseController {
 	public static function new_recipe_page() {
 		self::check_logged_in_is_admin();
 
+		$categories = Category::all();
+
 		//View::make('recipes/drink_form.html', array('type' => "new"));
-		View::make('recipes/new_drink.html');
+		View::make('recipes/new_drink.html', array('categories' => $categories));
 	}
 
 	//does not check for category-error since that will be changed to 'choose from'-input
@@ -157,21 +145,9 @@ class RecipeController extends BaseController {
 
 		$params = $_POST;
 
-		$ingredients = array();
-		$max_ing = (count($params) - 4) / 2;
+		$categories = Category::all();
 
-		for($i = 1; $i <= $max_ing; $i++) {
-			$key_name = 'ing_name' . $i;
-
-			if(isset($params[$key_name])) {
-				$ing_name = $params[$key_name];
-
-				$key_amount = 'ing_amount' . $i;		
-				$ing_amount = $params[$key_amount];
-
-				$ingredients[] = new Ingredient(array('name' => $ing_name, 'amount' => $ing_amount));
-			}
-		}
+		$ingredients = $ingredients = self::old_ingredients($params);
 
 		if($params['action'] == "add") {
 
@@ -188,7 +164,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/new_drink.html', array('recipe' => $recipe));
+				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'categories' => $categories));
 
 				//change so it keeps the faulty input in the boxes.
 			} else {
@@ -198,7 +174,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 
 		//else?
@@ -218,7 +194,7 @@ class RecipeController extends BaseController {
 				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' . $recipe->name . ', successfully added'));
 
 			} else {
-				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 		}
 
@@ -243,20 +219,7 @@ class RecipeController extends BaseController {
 
 	}
 
-
-
-
-	//move these into suggestionController?
-
-	public static function suggestNew() {
-		//View::make('recipes/drink_form.html', array('type' => "suggest_new"));
-		View::make('recipes/suggest_drink.html');
-	}
-	
-	public static function saveSuggestion() {
-
-		$params = $_POST;
-
+	private static function old_ingredients($params) {
 		$ingredients = array();
 		$max_ing = (count($params) - 4) / 2;
 
@@ -273,6 +236,30 @@ class RecipeController extends BaseController {
 			}
 		}
 
+		return $ingredients;
+
+	}
+
+
+
+
+	//move these into suggestionController?
+
+	public static function suggestNew() {
+		//View::make('recipes/drink_form.html', array('type' => "suggest_new"));
+		$categories = Category::all();
+
+		View::make('recipes/suggest_drink.html', array('categories' => $categories));
+	}
+	
+	public static function saveSuggestion() {
+
+		$params = $_POST;
+
+		$categories = Category::all();
+
+		$ingredients = self::old_ingredients($params);
+
 		if($params['action'] == "add") {
 
 			$newIngredient = new Ingredient(array('name' => $params['new_ingredient_name'], 'amount' => $params['new_ingredient_amount']));
@@ -288,7 +275,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe));
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'categories' => $categories));
 
 				//change so it keeps the faulty input in the boxes.
 			} else {
@@ -298,7 +285,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 
 		//else?
@@ -323,7 +310,7 @@ class RecipeController extends BaseController {
 				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink suggestion, ' . $recipe->name . ', sent'));
 
 			} else {
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors));
+				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 		}
 
@@ -347,9 +334,7 @@ class RecipeController extends BaseController {
 
 	}
 
-	//view not editable, has buttons:
-	//approve, dismiss, edit
-	//edit: save ---> approved OR **save ---> reload viewSuggestion with changes**
+
 	public static function viewSuggestion($id) {
 		self::check_logged_in_is_admin();
 
@@ -371,9 +356,6 @@ class RecipeController extends BaseController {
 
 		$suggestions = Recipe::suggestions();
 		View::make('/recipes/list_suggestions.html', array('recipes' => $suggestions));
-		
-		//View suggestionlist (like list, without delete, without newbutton and with namelink---> viewsuggestion)
-			//should it show who added it? should list? then I would have to change recipe->user to User instead of int.
 	}
 
 }
