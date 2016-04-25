@@ -31,22 +31,24 @@
 		<div class="panel-heading">Approved</div>
 		<div class="panel-body">
 			<div class="list-group">
-				<a href="link" class="list-group-item">drink 1</a>
-				<a href="link" class="list-group-item">drink 2</a>
-				<a href="link" class="list-group-item">drink 3</a>
+				{% for recipe in approved %}
+					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
+				{% endfor %}
 			</div>
 		</div>
 	</div>
+	{% if user.admin == false %}
 	<div class="panel panel-primary">
 		<div class="panel-heading">Pending approval</div>
 		<div class="panel-body">
 			<div class="list-group">
-				<a href="link" class="list-group-item">drink 1</a>
-				<a href="link" class="list-group-item">drink 2</a>
-				<a href="link" class="list-group-item">drink 3</a>
+				{% for recipe in pending %}
+					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
+				{% endfor %}
 			</div>
 		</div>
 	</div>
+	{% endif %}
 </div>
 
 <br>

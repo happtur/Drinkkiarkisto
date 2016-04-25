@@ -122,6 +122,34 @@ class User extends BaseModel {
 		$query->execute(array('password' => $this->password, 'id' => $this->id));
 	}
 
+	public function contributions() {
+		$approved = $this->contributions_that_are(true);
+		$pending = $this->contributions_that_are(false);
+		
+		$recipes = array('approved' => $approved, 'pending' => $pending);
+
+		return $recipes;
+	}
+
+	private function contributions_that_are($approved_status) {
+		$recipes = array();
+
+		if($approved_status){
+			$query = DB::connection()->prepare('SELECT id, name FROM Recipe WHERE added_by = :id AND approved = true;');
+		} else {
+			$query = DB::connection()->prepare('SELECT id, name FROM Recipe WHERE added_by = :id AND approved = false;');
+		}
+
+		$query->execute(array('id' => $this->id));
+		$rows = $query->fetchAll();
+
+		foreach ($rows as $row) {
+			$recipes[] = new Recipe(array('id' => $row['id'], 'name' => $row['name']));
+		}
+
+		return $recipes;
+	}
+
 
 	public function validate_name() {
 		$errors = array();

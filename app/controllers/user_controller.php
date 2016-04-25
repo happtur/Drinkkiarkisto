@@ -32,6 +32,7 @@ class UserController extends BaseController {
 
 
 	public static function handle_new_user() {
+
 		$params = $_POST;
 
 		$user = new User(array('name' => $params['name'], 'password' => $params['password']));
@@ -77,8 +78,9 @@ class UserController extends BaseController {
 		self::check_logged_in_is_admin_or_has_id($id);
 
 		$user = User::find($id);
-		//find recipes
-		View::make('user/user.html', array('user' => $user));
+		$recipes = $user->contributions();
+
+		View::make('user/user.html', array('user' => $user, 'approved' => $recipes['approved'], 'pending' => $recipes['pending']));
 	}
 
 	public static function change_password($id) {

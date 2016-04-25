@@ -21,10 +21,6 @@ $routes->post('/logout', function() {
   UserController::logout();
 });
 
-$routes->get('/user/:id', function($id) {
-  UserController::show_user($id);
-});
-
 $routes->get('/users', function() {
   UserController::list_all();
 });
