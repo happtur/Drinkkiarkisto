@@ -23,6 +23,21 @@ class Ingredient extends BaseModel {
 		}
 	}
 
+	public static function all() {
+		$query = DB::connection()->prepare('SELECT name FROM Ingredient;');
+		$query->execute();
+		$rows = $query->fetchAll();
+
+		$ingredients = array();
+		foreach ($rows as $row) {
+			$ingredients[] = $row['name'];
+		}
+
+		return $ingredients;
+	}
+
+	//function allInUseByApprovedRecipe() ??
+
 	//needed only when useless, i.e. not in Recipe_ingredient. So this function assumes that that's the case..
 	public function delete() {
 		$query = DB::connection()->prepare('DELETE FROM Ingredient WHERE id = :id;');

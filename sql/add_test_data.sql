@@ -1,3 +1,8 @@
+INSERT INTO Service_user (name, password) VALUES ('Kalle', 'Kalle123');
+INSERT INTO Service_user (name, password) VALUES ('name', 'password');
+INSERT INTO Service_user (name, password, admin) VALUES ('admin', 'password', true);
+INSERT INTO Service_user (name, password, admin) VALUES ('Pelle', 'Pelle123', true);
+
 INSERT INTO Ingredient (name) VALUES ('light rum');
 INSERT INTO Ingredient (name) VALUES ('cola');
 INSERT INTO Ingredient (name) VALUES ('lime juice');
@@ -40,7 +45,4 @@ INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (8, 3, '6 spri
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (9, 3, '2 tsp');
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (10, 3, 'to taste');
 
-INSERT INTO Service_user (name, password) VALUES ('Kalle', 'Kalle123');
-INSERT INTO Service_user (name, password) VALUES ('name', 'password');
-INSERT INTO Service_user (name, password, admin) VALUES ('admin', 'password', true);
 

@@ -10,7 +10,7 @@ CREATE TABLE Category(
 
 CREATE TABLE Recipe(
 	id SERIAL PRIMARY KEY,
-	name varchar(50) UNIQUE NOT NULL,
+	name varchar(50) NOT NULL,
 	category INTEGER REFERENCES Category(id),
 	instructions varchar(600),
 	approved boolean NOT NULL,

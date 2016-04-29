@@ -1,9 +1,10 @@
 <?php
 
 class Category extends BaseModel {
+	public $id, $name;
 
 	public static function getId($name) {
-		
+
 		$query = DB::connection()->prepare('SELECT id FROM Category WHERE name = :name LIMIT 1;');
 		$query->execute(array('name' => $name));
 		$row = $query->fetch();
@@ -16,13 +17,13 @@ class Category extends BaseModel {
 	}
 
 	public static function all() {
-		$query = DB::connection()->prepare('SELECT name FROM Category;');
+		$query = DB::connection()->prepare('SELECT id, name FROM Category;');
 		$query->execute();
 		$rows = $query->fetchAll();
 
 		$categories = array();
 		foreach ($rows as $row) {
-			$categories[] = $row['name'];
+			$categories[] = new Category(array('id' => $row['id'], 'name' => $row['name']));
 		}
 
 		return $categories;

@@ -7,6 +7,52 @@
 	<h4>What are you in the mood for today, {{user_logged_in.name}}?</h4>
 {% endif %}
 
+<hr>
+
+<form method="get" action="">
+	<h3>Search</h3>
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">Name contains</label>
+		<div class="col-xs-8">
+			<input type="text" class="form-control" name="search">
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">In one of the following categories</label>
+		<div class="col-xs-8">
+			<select class="form-control" multiple="" name="categories[]">
+				{% for category in categories %}
+					<option value="{{category.id}}" selected>{{category.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+	<!-- ridiculous when many ingredients! a text box instead (only one ingredient) or same checkbox thingy? unless bootstrap-select? or idk -->
+	<!-- value = {{ingredient.id}} (then change $ingredients from array of strings to array of ingredient-ids) -->
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">Contains all of the following ingredients</label>
+		<div class="col-xs-8">
+			<select class="form-control" multiple="" name="ingredients[]">
+				{% for ingredient in ingredients %}
+					<option>{{ingredient}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<h4>Order by</h4>
+		<label class="radio-inline"><input checked type="radio" name="order" value="name">Name</label>
+		<label class="radio-inline"><input type="radio" name="order" value="category">Category</label>
+		<label class="radio-inline"><input type="radio" name="order" value="ingredientnumber">Number of ingredients</label>
+	</div>
+	<button type="submit" class="btn btn-default">Search</button>
+</form>
+
+<br>
+
+<div>
 <table class="table table-bordered table-striped">
 	<thead>
 		<th>Name</th>
@@ -31,6 +77,7 @@
 		{% endfor %}
 	</tbody>
 </table>
+</div>
 
 <p>
 {% if user_logged_in and user_logged_in.admin == true %}

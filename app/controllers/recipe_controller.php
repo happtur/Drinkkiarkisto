@@ -1,14 +1,23 @@
 <?php
 
-//validate instructions doesn't work when edit, new, suggest
 
 class RecipeController extends BaseController {
 
 	//going to fix the copy paste eventually
 
 	public static function list_drinks() {
-		$recipes = Recipe::findAll();
-		View::make('recipes/list.html', array('recipes' => $recipes));
+		$params = $_GET;
+
+		if(empty($params)) {
+			$params['order'] = 'name';
+		}
+
+		$recipes = Recipe::findAll($params);
+		$ingredients = Ingredient::all();
+		$categories = Category::all();
+
+		//'chosen' => ...
+		View::make('recipes/list.html', array('recipes' => $recipes, 'ingredients' => $ingredients, 'categories' => $categories));
 	}
 
 	public static function show_drink($id) {
@@ -139,7 +148,7 @@ class RecipeController extends BaseController {
 		View::make('recipes/new_drink.html', array('categories' => $categories));
 	}
 
-	//does not check for category-error since that will be changed to 'choose from'-input
+
 	public static function store_recipe() {
 		self::check_logged_in_is_admin();
 
@@ -342,12 +351,18 @@ class RecipeController extends BaseController {
 		View::make('/recipes/suggestion.html', array('recipe' => $recipe));
 	}
 
-
 	public static function approveSuggestion($id) {
 		self::check_logged_in_is_admin();
 
-		Recipe::approve($id);
-		Redirect::to('/drink/' . $id, array('success' => 'Drink approved'));
+		$recipe = Recipe::findOne($id);
+		$errors = $recipe->errors();
+
+		if(count($errors) == 0) {
+			$recipe->approve();
+			Redirect::to('/drink/' . $id, array('success' => 'Drink approved'));
+		} else {
+			View::make('/recipes/suggestion.html', array('recipe' => $recipe, 'errors' => $errors));
+		}
 	}
 
 

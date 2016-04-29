@@ -25,10 +25,10 @@
 		<label>Category</label>
 		<select class="form-control" name="category">
 			{% for category in categories %}
-				{% if category is same as(recipe.category) %}
-					<option value="{{category}}" selected>{{category}}</option>
+				{% if category.name is same as(recipe.category) %}
+					<option value="{{category.name}}" selected>{{category.name}}</option>
 				{% else %}
-					<option value="{{category}}">{{category}}</option>
+					<option value="{{category.name}}">{{category.name}}</option>
 				{% endif %}}
 			{% endfor %}
 		</select>
