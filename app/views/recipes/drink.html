@@ -1,11 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if success %}
-<div class="alert alert-success">
-	{{success}}
-</div>
-{% endif %}
+{% import "macros/alerts.html" as alerts %}
+
+{{alerts.show_success(success)}}
 
 <h1>{{recipe.name}}</h1>
 
@@ -32,6 +30,11 @@
 {% if user_logged_in and user_logged_in.admin == true %}
 <p>
 	<a href="{{base_path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
+
+	<!-- (delete = get), macros..
+	<form method="post" action="{{base_path}}/game/{{game.id}}/destroy" class="destroy-form" data-confirm="Oletko varma, että haluat poistaa pelin?">
+      <button type="submit" class="btn btn-danger">Poista</button>
+    </form> -->
 	<a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
 </p>
 {% endif %}

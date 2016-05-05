@@ -1,12 +1,7 @@
 <?php
 
-//fix helloworld :D
 $routes->get('/', function() {
-  HelloWorldController::index();
-});
-
-$routes->get('/hiekkalaatikko', function() {
-  HelloWorldController::sandbox();
+  DrinkkiarkistoController::index();
 });
 
 $routes->get('/login', function() {

@@ -14,8 +14,12 @@
 		{% for user in users %}
 		<tr>
 			<td><a href="{{base_path}}/user/{{user.id}}">{{user.name}}</a></td>
-			<!-- make pretty -->
-			<td>{{user.admin}}</td>
+			<!-- make prettier -->
+			{% if user.admin == true %}
+				<td>yes</td>
+			{% else %}
+				<td>no</td>
+			{% endif %}
 			<td>{{user.recipes_added}}</td>
 
 			<!-- checks for every user -->

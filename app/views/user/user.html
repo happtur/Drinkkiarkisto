@@ -17,10 +17,11 @@
 	</div>
 {% endif %}
 
-<h1>User: {{user.name}}</h1>
 
 {% if user.admin == true %}
-	<h6>admin</h6> <!-- not heading, same with recipelist, mood -->
+	<h1>User: {{user.name}} <small>admin</small></h1>
+{% else %}
+	<h1>User: {{user.name}}</h1>
 {% endif %}
 
 <br>
@@ -47,7 +48,7 @@
 					<a href="{{base_path}}/drink/suggestion/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
 					{% else %}
 					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
-					{% endif %}}
+					{% endif %}
 				{% endfor %}
 			</div>
 		</div>

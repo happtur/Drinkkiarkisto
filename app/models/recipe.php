@@ -1,13 +1,15 @@
 <?php
 
 
+//category: String, int or Category?
+//Suggestion extends Recipe?
 class Recipe extends BaseModel {
 	public $id, $name, $category, $instructions, $added_by, $ingredients, $numberOfIngredients, $validators;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
 
-		$this->validators = array('validate_name', 'validate_instructions');
+		$this->validators = array('validate_name', 'validate_instructions', 'validate_ingredients');
 	}
 
 
@@ -44,13 +46,8 @@ class Recipe extends BaseModel {
 	}
 
 	public function saveIngredients() {
-
 		foreach ($this->ingredients as $ingredient) {
-			$ingredient->saveIfNeeded();
-
-			//move to ingredient? $ingredient->addToRecipe($recipe_id)
-			$query = DB::connection()->prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:recipe, :ingredient, :amount);');
-			$query->execute(array('recipe' => $this->id, 'ingredient' => $ingredient->id, 'amount' => $ingredient->amount));
+			$ingredient->addToRecipe($this->id);
 		}
 	}
 
@@ -60,6 +57,8 @@ class Recipe extends BaseModel {
 
 		$query = DB::connection()->prepare('DELETE FROM Recipe WHERE id = :id;');
 		$query->execute(array('id' => $this->id));
+
+		Ingredient::deleteAllInactive();
 	}
 
 
@@ -75,13 +74,12 @@ class Recipe extends BaseModel {
 			ON Ingredients.recipe = Recipe.id 
 			WHERE Recipe.approved = true';
 
+
 		if(isset($options['search'])) {
 			$query_string .= ' AND Recipe.name LIKE :like';
 			$parameters['like'] = '%' . $options['search'] . '%';
 		}
 
-		//as it is now, there will 'always' be an $option['categories']
-		//and the most common (all categories) causes the most (and unnecessary) work. fix this :)
 		if(isset($options['categories'])) {
 			$first = true;
 			$query_string .= ' AND Recipe.category IN (';
@@ -100,32 +98,25 @@ class Recipe extends BaseModel {
 		}
 
 		if(isset($options['ingredients'])) {
-			// :S ridikilöös (if this, remember to move to the right place)
-			// select recipe.id as id, recipe.name as name, category.name as category, ingredients.number_of_ingredients as number_of_ingredients
-			// from recipe
-			// left join category on recipe.category = category.id
-			// left join
-			// (select recipe, count(*) as number_of_ingredients
-				// from recipe_ingredient
-				// group by recipe) as ingredients
-				// on ingredients.recipe = recipe.id
+			$chosen_numb_ing = count($options['ingredients']);
 
-			// inner join
-			// (select recipe
-				// from recipe_ingredient where ingredient = x) as ingredient1
-				// on ingredient1.recipe = recipe.id
-			// inner join
-				// (select recipe
-				// from recipe_ingredient where ingredient = y) as ingredient2
-				// on ingredient2.recipe = recipe.id
-			// inner join
-				// (select recipe
-				// from recipe_ingredient where ingredient = z) as ingredient3
-				// on ingredient3.recipe = recipe.id
+			$query_string .= ' AND Recipe.id IN (SELECT Recipe FROM (SELECT recipe, COUNT(*) AS chosen_ings_in_recipe FROM Recipe_ingredient WHERE ingredient IN (';
 
-			//  where recipe.approved = true
-			// and recipe.category in (1,2,3); 
+			$first = true;
+			foreach ($options['ingredients'] as $chosen_ing) {
+				if(!$first) {
+					$query_string .= ', ';
+				} else {
+					$first = false;
+				}
+
+				$query_string .= $chosen_ing;
+			}
+
+			$query_string .= ') GROUP BY recipe) AS recipes_with_chosen_ing WHERE recipes_with_chosen_ing.chosen_ings_in_recipe = ' . $chosen_numb_ing . ') ';
+
 		}
+
 
 		$query_string .= ' ORDER BY ';
 
@@ -135,12 +126,10 @@ class Recipe extends BaseModel {
 		} else if(strcmp($options['order'], 'category') == 0) {
 			$query_string .= 'category';
 
-			//0 -> null -> last
 		} else {
 			$query_string .= 'number_of_ingredients';
 
 		}
-
 
 		$query = DB::connection()->prepare($query_string . ';');
 		$query->execute($parameters);
@@ -158,8 +147,6 @@ class Recipe extends BaseModel {
 			WHERE Recipe.id = :id;');
 
 		$query -> execute(array('id' => $id));
-
-//1.
 		$row = $query->fetch();
 		$ingredients = array();
 
@@ -194,7 +181,7 @@ class Recipe extends BaseModel {
 			(SELECT recipe, COUNT(*) AS number_of_ingredients FROM Recipe_ingredient GROUP BY recipe) AS Ingredients 
 			ON Ingredients.recipe = Recipe.id 
 			WHERE Recipe.approved = false;');
-
+		$query->execute();
 
 		return self::recipesFromQuery($query);
 	}
@@ -222,6 +209,7 @@ class Recipe extends BaseModel {
 		$query->execute(array('id' => $this->id));
 	}
 
+	//when is needed, why not simply when find?
 	public static function isApproved($id) {
 		$query = DB::connection()->prepare('SELECT approved FROM Recipe WHERE id = :id;');
 		$query->execute(array('id' => $id));
@@ -272,6 +260,33 @@ class Recipe extends BaseModel {
 
 		return $errors;
 
+	}
+
+	public function validate_ingredients() {
+		$errors = array();
+
+		if(count($this->ingredients) < 2) {
+			$errors[] = 'The drink has to have at least two ingredients';
+		}
+		if($this->duplicate_ingredients()) {
+			$errors[] = "The drink can't have two or more ingredients with the same name";
+		}
+
+		return $errors;
+	}
+
+	private function duplicate_ingredients() {
+		$temp = array();
+		foreach ($this->ingredients as $ingredient) {
+			if(in_array($ingredient->name, $temp)) {
+				return true;
+
+			} else {
+				$temp[] = $ingredient->name;
+			}
+		}
+
+		return false;
 	}
 
 }

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% import _self as forms %}
+
+{% if type is same as("suggest_drink") %}
+	{{forms.drink_form(
+		"Suggest drink",
+		recipe, 
+		categories, 
+		"#{base_path}/drink/suggestion/new",
+		errors,
+		"Send")}}
+
+{% elseif type is same as("new_drink") %}
+	{{forms.drink_form(
+		"New drink",
+		recipe, 
+		categories,
+		"#{base_path}/drink/new",
+		errors)}}
+
+{% else %}
+	{{forms.drink_form(
+		"Edit drink #{recipe.name}",
+		recipe, 
+		categories, 
+		"#{base_path}/drink/#{recipe.id}/edit",
+		errors)}}
+
+{% endif %}
+
+{% endblock %}
+
+{% macro drink_form(headline, recipe, categories, action, errors, button_text) %}
+	{% import "macros/alerts.html" as alerts %}
+
+	{{alerts.show_errors(errors)}}
+
+	<h1>{{headline}}</h1><br>
+
+	<form method="post" action="{{action}}">
+		<div class="form-group">
+			<label for="inputName">Name</label>
+			<input type="text" class="form-control" id="inputName" name="name" value="{{recipe.name}}"></input>
+		</div>
+		<div class="form-group">
+			<label>Category</label>
+			<select class="form-control" name="category">
+				{% for category in categories %}
+					{% if category.name is same as(recipe.category) %}
+						<option value="{{category.name}}" selected>{{category.name}}</option>
+					{% else %}
+						<option value="{{category.name}}">{{category.name}}</option>
+					{% endif %}}
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label>Ingredients</label>
+
+			{% set counter = 1 %}
+			{% for ingredient in recipe.ingredients %}
+
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" name="ing_name{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
+				</label>
+				<input type="text" class="form-control" name="ing_amount{{counter}}" value="{{ingredient.amount}}"></input>
+				<br>
+			</div>
+		
+			{% set counter = counter +1 %}
+			{% endfor %}		
+		</div>
+		<div class="form-group">
+			<label>Add ingredient</label>
+			<input type="text" class="form-control" name="new_ingredient_name" placeholder="Ingredient"></input>
+			<input type="text" class="form-control" name="new_ingredient_amount" placeholder="Amount"></input>
+			<button type="submit" class="btn btn-primary" name="action" value="add">Done</button>
+		</div>
+
+		<div class="form-group">
+			<label>Instructions</label>
+			<textarea class="form-control" name="instructions">{{recipe.instructions}}</textarea>
+		</div>
+		<div class="form-group">
+			<button type="submit" class="btn btn-primary" name="action" value="save">{{button_text|default('Save')}}</button>
+		</div>
+	</form>
+
+{% endmacro %}

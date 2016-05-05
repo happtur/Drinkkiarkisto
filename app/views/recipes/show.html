@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- not in use (yet?) -->
+
+{% import "macros/alerts.html" as alerts %}
+{% import _self as forms %}
+
+{{alerts.show_success(success)}}
+{{alerts.show_errors(errors)}}
+
+{% forms.show_drink(recipe) %}
+
+<p>
+	<a href="{{base_path}}/drink/{{recipe.id}}/edit" class="btn btn-primary btn-sm">Edit</a>
+
+{% if type is same as("suggestion") %}
+
+	<a href="{{base_path}}/drink/suggestion/{{recipe.id}}/approve" class="btn btn-success btn-sm">Approve</a>
+		<a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Dismiss</a>
+	</p>
+
+{% else %}
+
+	{% if user_logged_in and user_logged_in.admin == true %}
+		<!-- (delete = get), macros..
+		<form method="post" action="{{base_path}}/game/{{game.id}}/destroy" class="destroy-form" data-confirm="Oletko varma, että haluat poistaa pelin?">
+	      <button type="submit" class="btn btn-danger">Poista</button>
+    	</form> -->
+		<a href="{{base_path}}/drink/{{recipe.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
+		</p>
+	{% endif %}
+
+{% endif %}
+{% endblock %}
+
+{% macro show_drink(recipe) %}
+	<h1>{{recipe.name}}</h1>
+	<p>Category: {{recipe.category}}</p>
+
+	<table class="table table-condensed table-striped">
+		<tbody>
+		{% for ingredient in recipe.ingredients %}
+			<tr>
+				<td>{{ingredient.amount}}</td>
+				<td>{{ingredient.name}}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+
+	<p>
+		{{recipe.instructions}}
+	</p>
+	<br>
+{% endmacro %}

@@ -1,10 +1,10 @@
 <?php
 
-
 class RecipeController extends BaseController {
 
 	//going to fix the copy paste eventually
 
+	//make search case insensitive?
 	public static function list_drinks() {
 		$params = $_GET;
 
@@ -13,13 +13,13 @@ class RecipeController extends BaseController {
 		}
 
 		$recipes = Recipe::findAll($params);
-		$ingredients = Ingredient::all();
+		$ingredients = Ingredient::all(true);
 		$categories = Category::all();
 
-		//'chosen' => ...
-		View::make('recipes/list.html', array('recipes' => $recipes, 'ingredients' => $ingredients, 'categories' => $categories));
+		View::make('recipes/list.html', array('recipes' => $recipes, 'ingredients' => $ingredients, 'categories' => $categories, 'chosen' => $params));
 	}
 
+	//now anyone can see suggestions here, limit to the suggester? atm: Recipe::isApproved($id)
 	public static function show_drink($id) {
 		$recipe = Recipe::findOne($id);
 		View::make('recipes/drink.html', array('recipe' => $recipe));
@@ -32,7 +32,7 @@ class RecipeController extends BaseController {
 			$categories = Category::all();
 
 			//View::make('recipes/drink_form.html', array('recipe' => $recipe, 'type' => "edit"));
-			View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'categories' => $categories));
+			View::make('recipes/drink_form.html', array('type' => 'edit_drink', 'recipe' => $recipe, 'categories' => $categories));
 	}
 
 
@@ -61,7 +61,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'edit_drink', 'recipe' => $recipe, 'categories' => $categories));
 
 			//change so the boxes display the attempted input-values
 			} else {
@@ -72,7 +72,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'edit_drink', 'recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 			
 		//else?
@@ -99,7 +99,7 @@ class RecipeController extends BaseController {
 				
 
 			} else {
-				View::make('recipes/edit_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'edit_drink', 'recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 		}
 
@@ -145,7 +145,7 @@ class RecipeController extends BaseController {
 		$categories = Category::all();
 
 		//View::make('recipes/drink_form.html', array('type' => "new"));
-		View::make('recipes/new_drink.html', array('categories' => $categories));
+		View::make('recipes/drink_form.html', array('type' => 'new_drink', 'categories' => $categories));
 	}
 
 
@@ -173,7 +173,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'new_drink','recipe' => $recipe, 'categories' => $categories));
 
 				//change so it keeps the faulty input in the boxes.
 			} else {
@@ -183,7 +183,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'new_drink','recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 
 		//else?
@@ -203,7 +203,7 @@ class RecipeController extends BaseController {
 				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink, ' . $recipe->name . ', successfully added'));
 
 			} else {
-				View::make('recipes/new_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'new_drink','recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 		}
 
@@ -252,13 +252,13 @@ class RecipeController extends BaseController {
 
 
 
-	//move these into suggestionController?
+	//move these into SuggestionController extends RecipeController (so can use help-functions for saveSuggestion)?
 
 	public static function suggestNew() {
 		//View::make('recipes/drink_form.html', array('type' => "suggest_new"));
 		$categories = Category::all();
 
-		View::make('recipes/suggest_drink.html', array('categories' => $categories));
+		View::make('recipes/drink_form.html', array('type' => 'suggest_drink','categories' => $categories));
 	}
 	
 	public static function saveSuggestion() {
@@ -284,7 +284,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'suggest_drink','recipe' => $recipe, 'categories' => $categories));
 
 				//change so it keeps the faulty input in the boxes.
 			} else {
@@ -294,7 +294,7 @@ class RecipeController extends BaseController {
 					'instructions' => $params['instructions'],
 					'ingredients' => $ingredients));
 
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'suggest_drink','recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 
 		//else?
@@ -319,7 +319,7 @@ class RecipeController extends BaseController {
 				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink suggestion, ' . $recipe->name . ', sent'));
 
 			} else {
-				View::make('recipes/suggest_drink.html', array('recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
+				View::make('recipes/drink_form.html', array('type' => 'suggest_drink','recipe' => $recipe, 'errors' => $errors, 'categories' => $categories));
 			}
 		}
 

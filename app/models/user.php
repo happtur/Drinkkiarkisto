@@ -86,7 +86,6 @@ class User extends BaseModel {
 
 		$users = array();
 
-		//boolean admin!
 		foreach ($rows as $row) {
 
 			$admin = false;
@@ -94,11 +93,17 @@ class User extends BaseModel {
 				$admin = true;
 			}
 
+			if($row['recipes_added']) {
+				$recipes_added = $row['recipes_added'];
+			} else {
+				$recipes_added = 0;
+			}
+
 			$users[] = new User(array(
 				'id' => $row['id'],
 				'name' => $row['name'],
 				'admin' => $admin,
-				'recipes_added' => $row['recipes_added']));
+				'recipes_added' => $recipes_added));
 		}
 
 		return $users;
