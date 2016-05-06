@@ -2,7 +2,7 @@
 
 
 //category: String, int or Category?
-//Suggestion extends Recipe?
+//Suggestion extends Recipe? would be suggestions, save and approve, no use really? shortens this monster...  
 class Recipe extends BaseModel {
 	public $id, $name, $category, $instructions, $added_by, $ingredients, $numberOfIngredients, $validators;
 
@@ -61,9 +61,8 @@ class Recipe extends BaseModel {
 		Ingredient::deleteAllInactive();
 	}
 
-
+	//divide into smaller pieces
 	public static function findAll($options) {
-
 		$parameters = array();
 
 		$query_string = 'SELECT Recipe.id AS id, Recipe.name AS name, Category.name AS category, Ingredients.number_of_ingredients AS number_of_ingredients 

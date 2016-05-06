@@ -1,7 +1,6 @@
 <?php
 
 class User extends BaseModel {
-	//boolean admin database to php?
 	public $id, $name, $password, $admin, $recipes_added, $validators;
 
 	public function __construct($attributes) {
@@ -10,16 +9,7 @@ class User extends BaseModel {
 		$this->validators = array('validate_name', 'validate_password');
 	}
 
-	//save
-	//update (change password, change adminstatus)
-	//authenticate
-	//delete
-	//findOne
-	//validate (name, password)
-	//changePassword
-	//changeAdminStatus
-	//nameAvailable
-	//listAll (+amount of contributions)
+	//update
 
 	public function save() {
 		$query = DB::connection()->prepare('INSERT INTO Service_user (name, password) VALUES (:name, :password) RETURNING id;');
@@ -29,7 +19,6 @@ class User extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	//admin ???
 	public static function authenticate($name, $password) {
 		$query = DB::connection()->prepare('SELECT * FROM Service_user WHERE name= :name AND password= :password LIMIT 1;');
 		$query->execute(array('name' => $name, 'password' => $password));

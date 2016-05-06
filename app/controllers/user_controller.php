@@ -31,13 +31,13 @@ class UserController extends BaseController {
 	}
 
 
-	public static function handle_new_user() {
-
+	public static function store() {
 		$params = $_POST;
 
-		$user = new User(array('name' => $params['name'], 'password' => $params['password']));
-
+		$password = $params['password1'];
+		$user = new User(array('name' => $params['name'], 'password' => $password));
 		$errors = $user->errors();
+		$errors = array_merge($errors, self::check_if_same($password, $_POST['password2']));
 
 		if(count($errors) == 0) {
 			$user->save();
@@ -70,11 +70,11 @@ class UserController extends BaseController {
 		self::check_logged_in_is_admin();
 
 		User::make_admin($id);
-		Redirect::to('/', array('success' => 'User was successfully made an admin'));
+		Redirect::to('/user/' . $id, array('success' => 'User was successfully made an admin'));
 	}
 
 
-	public static function show_user($id) {
+	public static function show($id) {
 		self::check_logged_in_is_admin_or_has_id($id);
 
 		$user = User::find($id);
@@ -89,18 +89,31 @@ class UserController extends BaseController {
 			Redirect::to('/login', array('message' => "You can't change the password unless your logged in to that account!"));
 		}
 
-		$password = $_POST['password'];
+		$password = $_POST['password1'];
 
 		$user = new User(array('id' => $id, 'password' => $password));
 		$errors = $user->validate_password();
+		$errors = array_merge($errors, self::check_if_same($password, $_POST['password2']));
 
 		if(count($errors) == 0) {
 			$user->change_password();
 			Redirect::to('/user/' . $id, array('success' => 'Password was changed'));
+
 		} else {
 			$user = User::find($id);
-			View::make('/user/user.html', array('errors' => $errors, 'user' => $user));
+			$recipes = $user->contributions();
+			View::make('/user/user.html', array('errors' => $errors, 'user' => $user, 'approved' => $recipes['approved'], 'pending' => $recipes['pending']));
 		}
+	}
+
+	private static function check_if_same($first, $second) {
+		$errors = array();
+
+		if(strcmp($first, $second) != 0) {
+			$errors[] = "The passwords didn't match";
+		}
+
+		return $errors;
 	}
 
 }

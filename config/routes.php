@@ -25,7 +25,7 @@ $routes->get('/user/new', function() {
 });
 
 $routes->post('/user/new', function() {
-  UserController::handle_new_user();
+  UserController::store();
 });
 
 $routes->post('/user/:id/password', function($id) {
@@ -41,48 +41,47 @@ $routes->get('/user/:id/makeadmin', function($id) {
 });
 
 $routes->get('/user/:id', function($id) {
-  UserController::show_user($id);
+  UserController::show($id);
 });
 
 $routes->get('/drinks', function() {
- RecipeController::list_drinks();
+ RecipeController::list_all();
 });
 
-//change all /drink/suggestion/... to /suggestion/...?
 $routes->get('/drink/suggestions', function() {
-  RecipeController::suggestions();
+  SuggestionController::list_all();
 });
 
 $routes->get('/drink/suggestion/:id/delete', function($id) {
-  RecipeController::delete($id);
+  SuggestionController::delete($id);
 });
 
 $routes->get('/drink/suggestion/new', function() {
-  RecipeController::suggestNew();
+  SuggestionController::new_suggestion();
 });
 
 $routes->post('/drink/suggestion/new', function() {
-  RecipeController::saveSuggestion();
+  SuggestionController::save();
 });
 
 $routes->get('/drink/suggestion/:id/approve', function($id) {
-  RecipeController::approveSuggestion($id);
+  SuggestionController::approve($id);
 });
 
 $routes->get('/drink/suggestion/:id', function($id) {
-  RecipeController::viewSuggestion($id);
+  SuggestionController::view($id);
 });
 
 $routes->get('/drink/new', function() {
-  RecipeController::new_recipe_page();
+  RecipeController::new_drink();
 });
 
 $routes->post('/drink/new', function() {
-  RecipeController::store_recipe();
+  RecipeController::store();
 });
 
 $routes->get('/drink/:id/edit', function($id) {
-  RecipeController::edit_drink($id);
+  RecipeController::edit($id);
 });
 
 $routes->post('/drink/:id/edit', function($id) {
@@ -94,7 +93,7 @@ $routes->get('/drink/:id/delete', function($id) {
 });
 
 $routes->get('/drink/:id', function($id) {
- RecipeController::show_drink($id);
+ RecipeController::show($id);
 });
 
 

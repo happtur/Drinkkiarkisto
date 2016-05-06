@@ -10,7 +10,9 @@
 		categories, 
 		"#{base_path}/drink/suggestion/new",
 		errors,
-		"Send")}}
+		"Send recipe",
+		new_ingredient_name,
+		new_ingredient_amount)}}
 
 {% elseif type is same as("new_drink") %}
 	{{forms.drink_form(
@@ -18,7 +20,10 @@
 		recipe, 
 		categories,
 		"#{base_path}/drink/new",
-		errors)}}
+		errors,
+		"Save recipe",
+		new_ingredient_name,
+		new_ingredient_amount)}}
 
 {% else %}
 	{{forms.drink_form(
@@ -26,13 +31,16 @@
 		recipe, 
 		categories, 
 		"#{base_path}/drink/#{recipe.id}/edit",
-		errors)}}
+		errors,
+		"Save recipe",
+		new_ingredient_name,
+		new_ingredient_amount)}}
 
 {% endif %}
 
 {% endblock %}
 
-{% macro drink_form(headline, recipe, categories, action, errors, button_text) %}
+{% macro drink_form(headline, recipe, categories, action, errors, button_text, new_ingredient_name, new_ingredient_amount) %}
 
 	{% import "macros/alerts.html" as alerts %}
 
@@ -77,8 +85,8 @@
 		</div>
 		<div class="form-group">
 			<label>Add ingredient</label>
-			<input type="text" class="form-control" name="new_ingredient_name" placeholder="Ingredient"></input>
-			<input type="text" class="form-control" name="new_ingredient_amount" placeholder="Amount"></input>
+			<input type="text" class="form-control" name="new_ingredient_name" placeholder="Ingredient" value="{{new_ingredient_name}}"></input>
+			<input type="text" class="form-control" name="new_ingredient_amount" placeholder="Amount" value="{{new_ingredient_amount}}"></input>
 			<button type="submit" class="btn btn-primary" name="action" value="add">Done</button>
 		</div>
 
@@ -87,7 +95,7 @@
 			<textarea class="form-control" name="instructions">{{recipe.instructions}}</textarea>
 		</div>
 		<div class="form-group">
-			<button type="submit" class="btn btn-primary" name="action" value="save">{{button_text|default('Save')}}</button>
+			<button type="submit" class="btn btn-primary" name="action" value="save">{{button_text}}</button>
 		</div>
 	</form>
 

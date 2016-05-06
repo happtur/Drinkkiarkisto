@@ -42,10 +42,13 @@
           <li><a href="{{base_path}}/drinks">Drink search</a></li>
           {% if user_logged_in %}
           <li><a href="{{base_path}}/user/{{user_logged_in.id}}">My page</a></li>
-            {% if user_logged_in.admin == true %}
-                <li><a href="{{base_path}}/drink/suggestions">Suggested drinks</a></li>
-                <li><a href="{{base_path}}/users">Users</a></li>
-            {% endif %}
+          {% endif %}
+          {% if user_logged_in and user_logged_in.admin == true %}
+              <li><a href="{{base_path}}/drink/new">Add drink</a></li>
+              <li><a href="{{base_path}}/drink/suggestions">Suggested drinks</a></li>
+              <li><a href="{{base_path}}/users">Users</a></li>
+          {% else %}
+              <li><a href="{{base_path}}/drink/suggestion/new">Suggest drink</a></li>
           {% endif %}
         </ul>
 
