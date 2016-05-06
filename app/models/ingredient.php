@@ -41,7 +41,8 @@ class Ingredient extends BaseModel {
 					 ON Recipe_ingredient.ingredient = Ingredient.id 
 				INNER JOIN Recipe
 					 ON Recipe_ingredient.recipe = Recipe.id 
-				WHERE Recipe.approved = true;');
+				WHERE Recipe.approved = true
+				ORDER BY Ingredient.name;');
 
 		} else {
 			$query = DB::connection()->prepare('SELECT * FROM Ingredient;');

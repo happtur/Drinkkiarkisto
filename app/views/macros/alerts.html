@@ -19,6 +19,14 @@
 	{% endif %}
 {% endmacro %}
 
+{% macro show_message(message) %}
+	{% if message %}
+		<div class="alert alert-info">
+		{{message}}
+		</div>
+	{% endif %}
+{% endmacro %}
+
 
 
 <!-- how to use:

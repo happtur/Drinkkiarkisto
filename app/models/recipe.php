@@ -124,7 +124,7 @@ class Recipe extends BaseModel {
 			$query_string .= 'name';
 
 		} else if(strcmp($options['order'], 'category') == 0) {
-			$query_string .= 'category';
+			$query_string .= 'Category.id';
 
 		} else {
 			$query_string .= 'number_of_ingredients';

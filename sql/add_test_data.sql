@@ -43,13 +43,13 @@ INSERT INTO Category (name) VALUES ('Non-alcoholic');
 INSERT INTO Category (name) VALUES ('Hot beverage');
 INSERT INTO Category (name) VALUES ('Other');
 
-INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Cuba Libre', 1, true, 1,
-	'Squeeze a lime into a Collins glass, add 2 or 3 ice cubes, and pour in the rum. Fill with cold Coca-Cola. Stir briefly.');
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Sparkling Seabreeze Punch', 3, false, 1,
+	'Combine the cranberry juice, grapefruit juice and vodka in a pitcher or punch bowl. Gently stir in sparkling wine. Garnish with grapefruit wheels or wedges, if desired.');
 
 INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Dry Martini', 1, true, 3,
 	'Straight: Pour all ingredients into mixing glass with ice cubes. Stir well. Strain in chilled martini cocktail glass. Garnish with olive.');
 
-INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Mojito', 1, false, 2,
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Mojito', 1, true, 2,
 	'Muddle mint leaves with sugar and lime juice. Add a splash of soda water and fill the glass with cracked ice. Pour the rum and top with soda water. Garnish and serve with straw.');
 
 INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Lemon drop', 2, true, 2,
@@ -65,15 +65,16 @@ INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('M
 INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Sima', 6, true, 4,
 	'Boil half of the water and pour over the sugars. Add the rest of the water and the lemon juice (for extra flavour add the peel (remove it in the bottling phase)), let cool to about 35-40°C. Dissolve the yeast in a small amount of the liquid and then mix into the rest. Keep at room temperature for a day before bottling. Add 1 tsp of sugar and a few raisins to the bottles. Do not put the cap on too tightly. The sima is ready when the raisins rise to the surface (about a week at fridge temperature and three days at room temperature). Consume within a week, store in the fridge.');
 
-INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Sparkling Seabreeze Punch', 3, false, 1,
-	'Combine the cranberry juice, grapefruit juice and vodka in a pitcher or punch bowl. Gently stir in sparkling wine. Garnish with grapefruit wheels or wedges, if desired.');
+INSERT INTO Recipe (name, category, approved, added_by, instructions) VALUES ('Cuba Libre', 1, false, 1,
+	'Squeeze a lime into a Collins glass, add 2 or 3 ice cubes, and pour in the rum. Fill with cold Coca-Cola. Stir briefly.');
+
 
 INSERT INTO Recipe (name, category, approved, instructions) VALUES ('Excrement juice (spam)', 5, false,
 	'Shocking content');
 
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (2, 1, '12 cl');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (1, 1, '5 cl');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (3, 1, '1 cl');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (2, 7, '12 cl');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (1, 7, '5 cl');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (3, 7, '1 cl');
 
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (4, 2, '6 cl');
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (5, 2, '1 cl');
@@ -102,11 +103,11 @@ INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (15, 6, '1-2')
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (18, 6, '1 ml');
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (19, 6, 'a few');
 
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (20, 7, '2 cups');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (21, 7, '2 cups');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (11, 7, '1 cup');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (22, 7, '750 ml');
-INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (23, 7, '1-2');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (20, 1, '2 cups');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (21, 1, '2 cups');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (11, 1, '1 cup');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (22, 1, '750 ml');
+INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (23, 1, '1-2');
 
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (24, 8, 'A disgusting amount');
 INSERT INTO Recipe_ingredient (ingredient, recipe, amount) VALUES (25, 8, 'A metric fuckton');

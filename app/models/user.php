@@ -77,6 +77,7 @@ class User extends BaseModel {
 		return null;
 	}
 
+	//possible to order by recipes added? filter by adminstatus?
 	public static function all() {
 		$query = DB::connection()->prepare('SELECT Service_user.id AS id, Service_user.name AS name, Service_user.admin AS admin, Temp.recipes_added AS recipes_added 
 			FROM Service_user 

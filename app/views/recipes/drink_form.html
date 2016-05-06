@@ -33,6 +33,7 @@
 {% endblock %}
 
 {% macro drink_form(headline, recipe, categories, action, errors, button_text) %}
+
 	{% import "macros/alerts.html" as alerts %}
 
 	{{alerts.show_errors(errors)}}

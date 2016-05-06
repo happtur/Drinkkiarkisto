@@ -2,35 +2,24 @@
 
 {% block content %}
 
-{% if success %}
-<div class="alert alert-success">
-	{{success}}
-</div>
-{% endif %}
+{% import "macros/alerts.html" as alerts %}
 
-{% if message %}
-<div class="alert alert-info">
-	{{message}}
-</div>
-{% endif %}
+{{alerts.show_success(success)}}
+{{alerts.show_message(message)}}
 
 <div class="page-header">
 	<h1>Welcome to the drinkkiarkisto</h1>
 </div>
 
 <br>
+<p>Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description Description</p>
 
+{% if not user_logged_in %}
+<br><br>
 <div>
 	<a href="{{base_path}}/login" class="btn btn-primary btn-lg">Log in</a>
 	<a href="{{base_path}}/user/new" class="btn btn-primary btn-lg">Sign up</a>
 </div>
-
-{% if user_logged_in.admin == true %}
-	<br>
-	<div>
-		<a href="{{base_path}}/users" class="btn btn-primary btn-lg">List of users</a>
-		<a href="{{base_path}}/drink/suggestions" class="btn btn-primary btn-lg">Suggested drinks</a>
-	</div>
 {% endif %}
 
 {% endblock %}

@@ -39,9 +39,13 @@
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="nav navbar-nav">
           <!-- Navigaation linkit -->
-          <li><a href="{{base_path}}/drinks">Drink Recipes</a></li>
+          <li><a href="{{base_path}}/drinks">Drink search</a></li>
           {% if user_logged_in %}
           <li><a href="{{base_path}}/user/{{user_logged_in.id}}">My page</a></li>
+            {% if user_logged_in.admin == true %}
+                <li><a href="{{base_path}}/drink/suggestions">Suggested drinks</a></li>
+                <li><a href="{{base_path}}/users">Users</a></li>
+            {% endif %}
           {% endif %}
         </ul>
 
