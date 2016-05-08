@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% import _self as macros %}
+{% import "macros/forms_and_input.html" as forms %}
+
+
 <h1>Users</h1>
 
 <table class="table table-bordered table-striped">
@@ -13,20 +17,18 @@
 	<tbody>
 		{% for user in users %}
 		<tr>
-			<td><a href="{{base_path}}/user/{{user.id}}">{{user.name}}</a></td>
-			<!-- make prettier -->
-			{% if user.admin == true %}
-				<td>yes</td>
-			{% else %}
-				<td>no</td>
-			{% endif %}
+			<td><a href="{{base_path}}/user/{{user.id}}">{{user.name}}</a></td>			
+			{{macros.show_admin_status(user.admin == true)}}
+			
 			<td>{{user.recipes_added}}</td>
 
-			<!-- checks for every user -->
-			{% if user_logged_in and user_logged_in.admin == true %}
-				<td><a href="{{base_path}}/user/{{user.id}}/makeadmin" class="btn btn-success btn-sm">Make admin</a></td>
-				<td><a href="{{base_path}}/user/{{user.id}}/delete" class="btn btn-danger btn-sm">Delete</a></td>
+			<td>{{forms.delete_button("#{base_path}/user/#{user.id}/delete", "Are you sure you want to remove #{user.name}?")}}
+			
+			<td>
+			{% if user.admin == false %}
+				<a href="{{base_path}}/user/{{user.id}}/makeadmin" class="btn btn-success btn-sm">Make admin</a>
 			{% endif %}
+			</td>
 
 		</tr>
 		{% endfor %}
@@ -34,3 +36,11 @@
 </table>
 
 {% endblock %}
+
+{% macro show_admin_status(is_admin) %}
+	{% if is_admin == true %}
+		<td>yes</td>
+	{% else %}
+		<td>no</td>
+	{% endif %}
+{% endmacro %}

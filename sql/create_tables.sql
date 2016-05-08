@@ -24,6 +24,9 @@ CREATE TABLE Recipe(
 	added_by INTEGER REFERENCES Service_user(id)
 );
 
+CREATE INDEX recipe_lower_name
+	ON Recipe(LOWER(name));
+
 CREATE TABLE Recipe_ingredient(
 	ingredient INTEGER REFERENCES Ingredient(id),
 	recipe INTEGER REFERENCES Recipe(id),

@@ -1,0 +1,56 @@
+
+{% macro radiobutton_group(options, name, selected) %}
+	{% for key, value in options %}
+		{% if selected is same as(key) %}
+			<label class="radio-inline"><input checked type="radio" name="{{name}}" value="{{key}}">{{value}}</label>
+		{% else %}
+			<label class="radio-inline"><input type="radio" name="{{name}}" value="{{key}}">{{value}}</label>
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro multiple_select(options, name, selected) %}
+	<select class="form-control" multiple="" name="{{name}}" data-toggle="tooltip" title="Use ctrl to select more than one option or deselect options">
+	{% for option in options %}
+		{% if option.id in selected %}
+			<option value="{{option.id}}" selected>{{option.name}}</option>
+		{% else %}
+			<option value="{{option.id}}">{{option.name}}</option>
+		{% endif %}
+	{% endfor %}
+	</select>
+{% endmacro %}
+
+{% macro select(options, name, selected) %}
+	<select class="form-control" name="{{name}}">
+		{% for option in options %}
+			{% if option.name is same as(selected) %}
+				<option value="{{option.name}}" selected>{{option.name}}</option>
+			{% else %}
+				<option value="{{option.name}}">{{option.name}}</option>
+			{% endif %}}
+		{% endfor %}
+	</select>
+{% endmacro %}
+
+{% macro ingredient_checkbox_group(ingredients) %}
+	{% set counter = 1 %}
+
+	{% for ingredient in ingredients %}
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" name="ing_name{{counter}}" value="{{ingredient.name}}" checked="checked">{{ingredient.name}}:
+			</label>
+			<input type="text" class="form-control" name="ing_amount{{counter}}" value="{{ingredient.amount}}"></input>
+			<br>
+		</div>
+		{% set counter = counter +1 %}
+	{% endfor %}
+
+{% endmacro %}
+
+{% macro delete_button(action, confirm_text, size, button_text) %}
+	<form method="post" action="{{action}}" class="destroy-form" data-confirm="{{confirm_text|default('Are you sure you want to proceed?')}}">
+		<button type="submit" class="btn btn-danger {{size|default(btn-sm)}}">{{button_text|default('Delete')}}</button>
+	</form>
+{% endmacro %}

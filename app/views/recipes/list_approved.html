@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% import "macros/forms_and_input.html" as input %}
+{% import "macros/tables.html" as tables %}
+
+<h1>Drinks</h1>
+<hr>
+
+{% if user_logged_in %}
+	<p style="font-weight:bold; font-size:1.25em; font-style:italic;">What are you in the mood for today, {{user_logged_in.name}}?</p>
+{% endif %}
+
+<form method="get" action="">
+	<h3>Search</h3>
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">Name contains</label>
+		<div class="col-xs-8">
+			<input type="text" class="form-control" name="search" value={{chosen.search}}>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">In one of the following categories</label>
+		<div class="col-xs-8">
+			{{input.multiple_select(categories, 'categories[]', chosen.categories)}}
+		</div>
+	</div>
+
+	<!-- ridiculous when many ingredients! a text box instead? (limits search to only one ingredient) or same checkbox thingy? unless bootstrap-select? or idk -->
+	<div class="form-group row">
+		<label class="col-xs-4 form-control-label">Contains all of the following ingredients</label>
+		<div class="col-xs-8">
+			{{input.multiple_select(ingredients, 'ingredients[]', chosen.ingredients)}}
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<h4 class="col-xs-5">Order by</h4>
+		<div class="col-xs-7">
+			{% set options = {'name' : 'Name', 'category' : 'Category', 'ingredientnumber' : 'Number of ingredients'} %}
+			{{input.radiobutton_group(options, 'order', chosen.order)}}
+		</div>
+	</div>
+	<button type="submit" class="btn btn-default">Search</button>
+</form>
+
+<br>
+
+<div>
+{% if user_logged_in and user_logged_in.admin == true %}
+	<!-- Since button_name 'Delete' is specified there will be a delete-button -->
+	{{tables.list_drinks(base_path, recipes, "#{base_path}/drink", 'Delete')}}
+{% else %}
+	<!-- No button_name, so no delete-button -->
+	{{tables.list_drinks(base_path, recipes, "#{base_path}/drink")}}
+{% endif %}
+</div>
+
+<p>
+{% if user_logged_in and user_logged_in.admin == true %}
+	<a href="{{base_path}}/drink/new" class="btn btn-primary btn-sm">Add drink</a>
+{% else %}
+	<a href="{{base_path}}/drink/suggestion/new" class="btn btn-primary btn-sm">Suggest new drink</a>
+{% endif %}
+</p>
+
+{% endblock %}

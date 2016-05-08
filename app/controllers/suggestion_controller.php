@@ -2,7 +2,6 @@
 
 class SuggestionController extends RecipeController {
 
-
 	public static function new_suggestion() {
 		$categories = Category::all();
 		View::make('recipes/drink_form.html', array('type' => 'suggest_drink','categories' => $categories));
@@ -21,12 +20,12 @@ class SuggestionController extends RecipeController {
 				$params['added_by'] = $user->id;
 			}
 
-			$recipe = self::get_recipe($params);
+			$recipe = new Suggestion(self::get_recipe($params));
 			$errors = $recipe->errors();
 
 
 			if(count($errors) == 0) {
-				$recipe->save(false);
+				$recipe->save();
 				Redirect::to('/drink/' . $recipe->id, array('success' => 'New drink suggestion, ' . $recipe->name . ', sent'));
 
 			} else {
@@ -38,39 +37,33 @@ class SuggestionController extends RecipeController {
 	}
 
 
-	public static function view($id) {
+	public static function show($id) {
 		self::check_logged_in_is_admin();
 
-		$recipe = Recipe::findOne($id);
-		View::make('/recipes/suggestion.html', array('recipe' => $recipe));
+		$recipe = Recipe::find_one($id);
+		View::make('/recipes/show.html', array('type' => 'suggestion', 'recipe' => $recipe));
 	}
 
 	public static function approve($id) {
 		self::check_logged_in_is_admin();
 
-		$recipe = Recipe::findOne($id);
+		$recipe = Recipe::find_one($id);
 		$errors = $recipe->errors();
 
 		if(count($errors) == 0) {
 			$recipe->approve();
 			Redirect::to('/drink/' . $id, array('success' => 'Drink approved'));
 		} else {
-			View::make('/recipes/suggestion.html', array('recipe' => $recipe, 'errors' => $errors));
+			View::make('/recipes/show.html', array('type' => 'suggestion', 'recipe' => $recipe, 'errors' => $errors));
 		}
 	}
 
 
-	public static function list_all() {
+	public static function all() {
 		self::check_logged_in_is_admin();
 
-		$suggestions = Recipe::suggestions();
+		$suggestions = Suggestion::all();
 		View::make('/recipes/list_suggestions.html', array('recipes' => $suggestions));
-	}
-
-	public static function delete($id) {
-		$recipe_name = self::remove_from_db($id);
-		//redirect to suggestionlist?
-		Redirect::to('/', array('success' => 'Suggestion ' . $recipe_name . ' was dismissed'));
 	}
 
 }

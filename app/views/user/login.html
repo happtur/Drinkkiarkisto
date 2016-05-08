@@ -1,17 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if error %}
-	<div class="alert alert-danger">
-	{{error}}
-	</div>
-{% endif %}
+{% import "macros/alerts.html" as alerts %}
 
-{% if message %}
-	<div class="alert alert-info">
-		{{message}}
-	</div>
-{% endif %}
+{{alerts.show_errors(errors)}}
+{{alerts.show_message(message)}}
 
 <h1>Log in</h1>
 </br>

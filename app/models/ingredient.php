@@ -7,20 +7,20 @@ class Ingredient extends BaseModel {
 		parent::__construct($attributes);
 
 		$this->name = strtolower($this->name);
-		$this->id = self::getId($this->name);
+		$this->id = self::get_id($this->name);
 
 		$this->validators = array('validate_name', 'validate_amount');
 	}
 
 
-	public function addToRecipe($recipe_id) {
-		$this->saveIfNeeded();
+	public function add_to_recipe($recipe_id) {
+		$this->save_if_needed();
 
 		$query = DB::connection()->prepare('INSERT INTO Recipe_ingredient (recipe, ingredient, amount) VALUES (:recipe, :ingredient, :amount);');
 		$query->execute(array('recipe' => $recipe_id, 'ingredient' => $this->id, 'amount' => $this->amount));
 	}
 
-	public function saveIfNeeded() {
+	public function save_if_needed() {
 		if($this->id == -1) {
 			$query = DB::connection()->prepare('INSERT INTO Ingredient (name) 
 				VALUES (:name) RETURNING id;');
@@ -60,13 +60,13 @@ class Ingredient extends BaseModel {
 	}
 
 
-	public static function deleteAllInactive() {
+	public static function delete_all_inactive() {
 		$query = DB::connection()->prepare('DELETE FROM Ingredient WHERE id NOT IN (SELECT DISTINCT ingredient FROM Recipe_ingredient);');
 		$query->execute();
 	}
 
 
-	public static function getId($name) {
+	public static function get_id($name) {
 		$query = DB::connection() -> prepare('SELECT id FROM Ingredient WHERE name = :name;');
 		$query -> execute(array('name' => $name));
 

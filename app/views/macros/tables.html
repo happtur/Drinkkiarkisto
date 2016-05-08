@@ -1,0 +1,51 @@
+{% macro show_drink(recipe) %}
+	<table class="table table-condensed table-striped">
+		<tbody>
+		{% for ingredient in recipe.ingredients %}
+			<tr>
+				<td>{{ingredient.amount}}</td>
+				<td>{{ingredient.name}}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+
+	<p>
+		{{recipe.instructions}}
+	</p>
+	<br>
+{% endmacro %}
+
+
+{% macro list_drinks(base_path, recipes, drink_path, button_text) %}
+	{% import "macros/forms_and_input.html" as forms %}
+
+	<table class="table table-bordered table-striped">
+	<thead>
+		<th>Name</th>
+		<th>Category</th>
+		<th>Number of ingredients</th>
+	</thead>
+
+	<tbody>
+	{% if button_text %}
+		{% for recipe in recipes %}
+		<tr>
+			<td><a href="{{drink_path}}/{{recipe.id}}">{{recipe.name}}</a></td>
+			<td>{{recipe.category}}</td>
+			<td>{{recipe.number_of_ingredients}}</td>
+			<td>{{forms.delete_button("#{base_path}/drink/#{recipe.id}/delete", "Are you sure you want to delete #{recipe.name}?")}}</td>
+		</tr>
+		{% endfor %}
+	{% else %}
+		{% for recipe in recipes %}
+		<tr>
+			<td><a href="{{base_path}}/drink/{{recipe.id}}">{{recipe.name}}</a></td>
+			<td>{{recipe.category}}</td>
+			<td>{{recipe.number_of_ingredients}}</td>
+		</tr>
+		{% endfor %}
+	{% endif %}
+	</tbody>
+</table>
+{% endmacro %}

@@ -1,22 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if success %}
-	<div class="alert alert-success">
-		{{success}}
-	</div>
-{% endif %}
+{% import "macros/alerts.html" as alerts %}
+{% import _self as macros %}
+{% import "macros/forms_and_input.html" as forms %}
 
-{% if errors %}
-	<div class="alert alert-danger">
-		<ul>
-			{% for error in errors %}
-			<li>{{error}}</li>
-			{% endfor %}
-		</ul>
-	</div>
-{% endif %}
-
+{{alerts.show_success(success)}}
+{{alerts.show_errors(errors)}}
 
 {% if user.admin == true %}
 	<h1>User: {{user.name}} <small>admin</small></h1>
@@ -31,26 +21,14 @@
 	<div class="panel panel-primary">
 		<div class="panel-heading">Approved</div>
 		<div class="panel-body">
-			<div class="list-group">
-				{% for recipe in approved %}
-					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
-				{% endfor %}
-			</div>
+			{{macros.list(base_path, approved, true)}}
 		</div>
 	</div>
 	{% if user.admin == false %}
 	<div class="panel panel-primary">
 		<div class="panel-heading">Pending approval</div>
 		<div class="panel-body">
-			<div class="list-group">
-				{% for recipe in pending %}
-					{% if user_logged_in.admin == true %}
-					<a href="{{base_path}}/drink/suggestion/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
-					{% else %}
-					<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
-					{% endif %}
-				{% endfor %}
-			</div>
+			{{macros.list(base_path, pending, false, user_logged_in.admin == true)}}
 		</div>
 	</div>
 	{% endif %}
@@ -72,6 +50,25 @@
 {% endif %}
 
 <br>
-<a href="{{base_path}}/user/{{user.id}}/delete" class="btn btn-danger">Delete account</a>
+{{forms.delete_button("#{base_path}/user/#{user.id}/delete", "Are you sure you want to delete #{user.name}?", "btn-sm", "Delete account")}}
 
 {% endblock %}
+
+
+{% macro list(base_path, recipes, approved, user_logged_in_is_admin) %}
+
+	<div class="list-group">
+	{% if approved or user_logged_in_is_admin != true %}
+		{% for recipe in recipes %}
+			<a href="{{base_path}}/drink/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>		
+		{% endfor %}
+
+	{% else %}
+		{% for recipe in recipes %}
+			<a href="{{base_path}}/drink/suggestion/{{recipe.id}}" class="list-group-item">{{recipe.name}}</a>
+		{% endfor %}
+		
+	{% endif %}
+	</div>
+
+{% endmacro %}

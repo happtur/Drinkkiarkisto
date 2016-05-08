@@ -10,4 +10,7 @@ $(document).ready(function(){
       submit.preventDefault();
     }
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
+  
 });

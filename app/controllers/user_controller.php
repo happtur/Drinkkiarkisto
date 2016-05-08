@@ -9,11 +9,20 @@ class UserController extends BaseController {
 	public static function handle_login() {
 		//password crypt()
 		$params = $_POST;
+		$errors = array();
 
-		$user = User::authenticate($params['name'], $params['password']);
-
+		$user = User::authenticate_name($params['name']);
 		if(is_null($user)) {
-			View::make('user/login.html', array('error' => "The password doesn't match the username", 'username' => $params['name']));
+			$errors[] = "There is no user with that name";
+
+		} else {
+			if(!$user->authenticate($params['password'])) {
+				$errors[] = "The password you entered is not correct";
+			}
+		}
+
+		if(count($errors) != 0) {
+			View::make('user/login.html', array('errors' => $errors, 'username' => $params['name']));
 
 		} else {
 			$_SESSION['user'] = $user->id;
@@ -31,7 +40,7 @@ class UserController extends BaseController {
 	}
 
 
-	public static function store() {
+	public static function save() {
 		$params = $_POST;
 
 		$password = $params['password1'];
@@ -49,23 +58,21 @@ class UserController extends BaseController {
 		}
 	}
 
-	//atm list shows number of all recipes, should change to approved/total?
-	public static function list_all() {
+	public static function all() {
 		self::check_logged_in_is_admin();
 
 		$users = User::all();
 		View::make('user/list.html', array('users' => $users));
 	}
 
-	//if you want the name displayed make user-object...
 	public static function delete($id) {
 		self::check_logged_in_is_admin_or_has_id($id);
 
-		User::delete($id);
-		Redirect::to('/', array('success' => 'User was successfully deleted'));
+		$user = User::find($id);
+		$user->delete();
+		Redirect::to('/', array('success' => 'User ' . $user->name . ' was successfully deleted'));
 	}
 
-	//if you want the name displayed....
 	public static function make_admin($id) {
 		self::check_logged_in_is_admin();
 
@@ -86,7 +93,7 @@ class UserController extends BaseController {
 	public static function change_password($id) {
 		$user = self::get_user_logged_in();
 		if($user->id != $id) {
-			Redirect::to('/login', array('message' => "You can't change the password unless your logged in to that account!"));
+			Redirect::to('/login', array('message' => "You can't change the password unless you're logged in to that account!"));
 		}
 
 		$password = $_POST['password1'];

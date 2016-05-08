@@ -9,8 +9,6 @@ class User extends BaseModel {
 		$this->validators = array('validate_name', 'validate_password');
 	}
 
-	//update
-
 	public function save() {
 		$query = DB::connection()->prepare('INSERT INTO Service_user (name, password) VALUES (:name, :password) RETURNING id;');
 		$query->execute(array('name' => $this->name, 'password' => $this->password));
@@ -19,9 +17,13 @@ class User extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	public static function authenticate($name, $password) {
-		$query = DB::connection()->prepare('SELECT * FROM Service_user WHERE name= :name AND password= :password LIMIT 1;');
-		$query->execute(array('name' => $name, 'password' => $password));
+	public function authenticate($password) {
+		return $this->password == $password;
+	}
+
+	public static function authenticate_name($name) {
+		$query = DB::connection()->prepare('SELECT * FROM Service_user WHERE name= :name LIMIT 1;');
+		$query->execute(array('name' => $name));
 		$row = $query->fetch();
 
 		if($row) {
@@ -42,7 +44,6 @@ class User extends BaseModel {
 		}
 	}
 
-
 	public static function find($id) {
 		$query = DB::connection()->prepare('SELECT * FROM Service_user WHERE id= :id LIMIT 1;');
 		$query->execute(array('id' => $id));
@@ -59,18 +60,17 @@ class User extends BaseModel {
 			return new User(array(
 				'id' => $id,
 				'name' => $row['name'],
-				'password' => $row['password'],
 				'admin' => $admin));
 		}
 
 		return null;
 	}
 
-	//possible to order by recipes added? filter by adminstatus?
 	public static function all() {
 		$query = DB::connection()->prepare('SELECT Service_user.id AS id, Service_user.name AS name, Service_user.admin AS admin, Temp.recipes_added AS recipes_added 
 			FROM Service_user 
-			LEFT JOIN (SELECT added_by, COUNT(*) AS recipes_added FROM Recipe WHERE approved = true GROUP BY added_by) AS Temp ON Temp.added_by = Service_user.id;');
+			LEFT JOIN (SELECT added_by, COUNT(*) AS recipes_added FROM Recipe WHERE approved = true GROUP BY added_by) AS Temp ON Temp.added_by = Service_user.id
+			ORDER BY recipes_added DESC;');
 		$query->execute();
 		$rows = $query->fetchAll();
 
@@ -99,16 +99,19 @@ class User extends BaseModel {
 		return $users;
 	}
 
-	public static function delete($id) {
+	public function delete() {
 		$query = DB::connection()->prepare('UPDATE Recipe SET added_by = NULL WHERE added_by = :id;');
-		$query->execute(array('id' => $id));
+		$query->execute(array('id' => $this->id));
 
 		$query = DB::connection()->prepare('DELETE FROM Service_user WHERE id = :id;');
-		$query->execute(array('id' => $id));
+		$query->execute(array('id' => $this->id));
 	}
 
 	public static function make_admin($id) {
-		$query = DB::connection()->prepare('UPDATE Service_user SET admin = true WHERE id = :id');
+		$query = DB::connection()->prepare('UPDATE Service_user SET admin = true WHERE id = :id;');
+		$query->execute(array('id' => $id));
+
+		$query = DB::connection()->prepare('UPDATE Recipe SET approved = true WHERE added_by = :id;');
 		$query->execute(array('id' => $id));
 	}
 

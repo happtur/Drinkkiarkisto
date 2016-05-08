@@ -1,15 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if errors %}
-	<div class="alert alert-danger">
-		<ul>
-			{% for error in errors %}
-			<li>{{error}}</li>
-			{% endfor %}
-		</ul>
-	</div>
-{% endif %}
+{% import "macros/alerts.html" as alerts %}
+
+{{alerts.show_errors(errors)}}
 
 <h1>New user</h1>
 </br>
