@@ -70,7 +70,7 @@ class User extends BaseModel {
 		$query = DB::connection()->prepare('SELECT Service_user.id AS id, Service_user.name AS name, Service_user.admin AS admin, Temp.recipes_added AS recipes_added 
 			FROM Service_user 
 			LEFT JOIN (SELECT added_by, COUNT(*) AS recipes_added FROM Recipe WHERE approved = true GROUP BY added_by) AS Temp ON Temp.added_by = Service_user.id
-			ORDER BY recipes_added DESC;');
+			ORDER BY recipes_added DESC NULLS LAST;');
 		$query->execute();
 		$rows = $query->fetchAll();
 

@@ -34,7 +34,7 @@
 			<td><a href="{{drink_path}}/{{recipe.id}}">{{recipe.name}}</a></td>
 			<td>{{recipe.category}}</td>
 			<td>{{recipe.number_of_ingredients}}</td>
-			<td>{{forms.delete_button("#{base_path}/drink/#{recipe.id}/delete", "Are you sure you want to delete #{recipe.name}?")}}</td>
+			<td>{{forms.delete_button("#{base_path}/drink/#{recipe.id}/delete", "Are you sure you want to delete #{recipe.name}?", "btn-sm", button_text)}}</td>
 		</tr>
 		{% endfor %}
 	{% else %}
