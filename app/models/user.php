@@ -51,7 +51,6 @@ class User extends BaseModel {
 		$row = $query->fetch();
 		if($row) {
 
-			//???
 			$admin = false;
 			if($row['admin'] == 't') {
 				$admin = true;
