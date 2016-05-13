@@ -19,7 +19,7 @@ class ApprovedRecipe extends Recipe {
 			ON Ingredients.recipe = Recipe.id 
 			WHERE Recipe.approved = true';
 
-		//not sure if should or shouldn't create index? it doesn't seem to use it (according to my interpretation of EXPLAIN 'feedback' XD)
+		//not sure if should or shouldn't create index? it doesn't seem to use it (according to my interpretation of EXPLAIN 'feedback' XD)  well of course not with a db of this size... buut, when bigger?
 		if(isset($options['search'])) {
 			$query_string .= ' AND LOWER(Recipe.name) LIKE LOWER(:like)';
 			$parameters['like'] = '%' . $options['search'] . '%';
